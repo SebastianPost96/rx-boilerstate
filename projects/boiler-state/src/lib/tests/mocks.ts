@@ -1,41 +1,47 @@
 import { State } from '../state';
-import { Selector } from '../types';
+import { StateConfig } from '../types';
 
 export interface TestItem {
   id: number;
+  title?: string;
 }
 export interface TestInterface {
   items: TestItem[];
   displayItems: boolean;
+  someString: string;
 }
 export class TestState extends State<TestInterface> {
   itemCalculations = 0;
 
-  constructor() {
-    super({ items: [], displayItems: false });
+  constructor(config?: StateConfig) {
+    super({ items: [], displayItems: false, someString: '' }, config);
   }
 
   items$ = this.select((state) => {
     this.itemCalculations++;
     return state.items;
   });
-
   displayItems$ = this.select((state) => state.displayItems);
-
-  factory$ = this.factory((state, id) =>
-    state.items.find((item) => item.id === id)
+  someString$ = this.select((state) => state.someString);
+  combination$ = this.select([this.items$, this.someString$], (items, str) =>
+    items.map((item) => ({ ...item, title: str }))
   );
 
-  combination: Selector<boolean> = this.select(
-    [this.items$, this.displayItems$],
-    (a, b) => {
-      return b;
-    }
+  getItemById$ = this.factory((state, id: number) =>
+    state.items.find((item) => item.id === id)
+  );
+  getItemsByTitle$ = this.factory([this.items$], ([items], title: string) =>
+    items.filter((item) => item.title === title)
   );
 
   addItem(item: TestItem): void {
     this.updateState((state) => {
       state.items.push(item);
+    });
+  }
+  setString(str: string): void {
+    this.updateState((state) => {
+      state.someString = str;
     });
   }
 }

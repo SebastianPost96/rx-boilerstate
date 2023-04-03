@@ -1,27 +1,14 @@
 import produce from 'immer';
-import {
-  BehaviorSubject,
-  Observable,
-  combineLatest,
-  distinctUntilChanged,
-} from 'rxjs';
+import { BehaviorSubject, Observable, combineLatest, distinctUntilChanged } from 'rxjs';
 import { map } from 'rxjs/operators';
-import {
-  asSelector,
-  deactivateLogging,
-  isLoggingDeactivated,
-  shareState,
-} from './helpers';
+import { asSelector, deactivateLogging, logActions, shareState } from './helpers';
 import { Selector, SelectorTuple, StateConfig } from './types';
 
 export abstract class State<S extends Record<string, any>> {
   private readonly store: BehaviorSubject<S>;
   private readonly defaults: S;
 
-  protected constructor(
-    defaults: S,
-    private readonly config: StateConfig = {}
-  ) {
+  protected constructor(defaults: S, private readonly config: StateConfig = {}) {
     this.defaults = produce(defaults, (s) => s);
     this.store = new BehaviorSubject(this.defaults);
 
@@ -29,24 +16,7 @@ export abstract class State<S extends Record<string, any>> {
     this.config.debug ??= false;
 
     if (this.config.debug) {
-      deactivateLogging(
-        this.select,
-        this.updateState,
-        this.destroy,
-        this.factory
-      );
-
-      return new Proxy(this, {
-        get(target: State<S>, p: keyof typeof target): unknown {
-          if (
-            typeof target[p] === 'function' &&
-            !isLoggingDeactivated(target[p])
-          ) {
-            console.log(target['constructor'].name + '.' + p);
-          }
-          return target[p];
-        },
-      });
+      return logActions(this);
     }
   }
 
@@ -62,31 +32,27 @@ export abstract class State<S extends Record<string, any>> {
     this.store.complete();
   }
 
-  protected updateState(
-    recipe: (currentState: S) => S | void | undefined
-  ): void {
+  protected updateState(recipe: (currentState: S) => S | void | undefined): void {
     this.store.next(produce(this.store.value, recipe));
-    if (this.config.debug) console.log(this.store.value);
+    if (this.config.debug) console.log(this.constructor.name, this.store.value);
   }
 
   protected select<T>(selectorFn: (state: S) => T): Selector<T>;
   protected select<T, Args extends unknown[]>(
-    selectorArgs: [...SelectorTuple<Args>],
+    selectors: [...SelectorTuple<Args>],
     selectorFn: (...args: Args) => T
   ): Selector<T>;
   protected select<T, TArgs extends unknown[]>(
-    selectorArgsOrFn: ((state: S) => T) | [...SelectorTuple<TArgs>],
+    selectorsOrFn: ((state: S) => T) | [...SelectorTuple<TArgs>],
     selectorFn?: (...args: TArgs) => T
   ): Selector<T> {
     let selection: Observable<T>;
 
-    if (Array.isArray(selectorArgsOrFn)) {
+    if (Array.isArray(selectorsOrFn)) {
       if (!selectorFn) throw new Error('Selector function was not provided.');
-      selection = combineLatest(selectorArgsOrFn).pipe(
-        map((args) => selectorFn(...(args as TArgs)))
-      );
+      selection = combineLatest(selectorsOrFn).pipe(map((args) => selectorFn(...(args as TArgs))));
     } else {
-      selection = this.store.pipe(map(selectorArgsOrFn));
+      selection = this.store.pipe(map(selectorsOrFn));
     }
 
     selection = selection.pipe(distinctUntilChanged(), shareState());
@@ -96,33 +62,19 @@ export abstract class State<S extends Record<string, any>> {
   protected factory<T, FnArgs extends unknown[]>(
     selectorFn: (state: S, ...fnArgs: FnArgs) => T
   ): (...fnArgs: FnArgs) => Selector<T>;
-  protected factory<
-    T,
-    SelectorArgs extends unknown[],
-    FnArgs extends unknown[]
-  >(
-    selectorArgs: [...SelectorTuple<SelectorArgs>],
+  protected factory<T, SelectorArgs extends unknown[], FnArgs extends unknown[]>(
+    selectors: [...SelectorTuple<SelectorArgs>],
     selectorFn: (selectorArgs: SelectorArgs, ...fnArgs: FnArgs) => T
   ): (...fnArgs: FnArgs) => Selector<T>;
-  protected factory<
-    T,
-    SelectorArgs extends unknown[],
-    FnArgs extends unknown[]
-  >(
-    selectorArgsOrFn:
-      | ((state: S, ...args: FnArgs) => T)
-      | [...SelectorTuple<SelectorArgs>],
+  protected factory<T, SelectorArgs extends unknown[], FnArgs extends unknown[]>(
+    selectorsOrFn: ((state: S, ...args: FnArgs) => T) | [...SelectorTuple<SelectorArgs>],
     selectorFn?: (selectorArgs: SelectorArgs, ...fnArgs: FnArgs) => T
   ) {
-    if (Array.isArray(selectorArgsOrFn)) {
-      if (!selectorFn) throw new Error('Selector function was not provided.');
-      return (...fnArgs: FnArgs) =>
-        this.select(selectorArgsOrFn, (...sArgs: SelectorArgs) =>
-          selectorFn(sArgs, ...fnArgs)
-        );
-    } else {
-      return (...args: FnArgs) =>
-        this.select((state) => selectorArgsOrFn(state, ...args));
-    }
+    const factoryFn = Array.isArray(selectorsOrFn)
+      ? (...fnArgs: FnArgs) => this.select(selectorsOrFn, (...sArgs: SelectorArgs) => selectorFn!(sArgs, ...fnArgs))
+      : (...args: FnArgs) => this.select((state) => selectorsOrFn(state, ...args));
+    deactivateLogging(factoryFn);
+
+    return factoryFn;
   }
 }

@@ -27,10 +27,8 @@ export class TestState extends State<TestInterface> {
     items.map((item) => ({ ...item, title: str }))
   );
 
-  getItemById$ = this.factory((state, id: number) =>
-    state.items.find((item) => item.id === id)
-  );
-  getItemsByTitle$ = this.factory([this.items$], ([items], title: string) =>
+  getItemById = this.factory((state, id: number) => state.items.find((item) => item.id === id));
+  getItemsByTitle = this.factory([this.items$], ([items], title: string) =>
     items.filter((item) => item.title === title)
   );
 
@@ -44,4 +42,5 @@ export class TestState extends State<TestInterface> {
       state.someString = str;
     });
   }
+  noop(): void {}
 }

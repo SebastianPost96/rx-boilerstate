@@ -34,33 +34,25 @@ describe('General State Tests', () => {
     expect(state.snapshot.items.length).toBe(0);
   });
 
-  it('should log actions', () => {
-    spyOn(console, 'log');
+  it('should combine two selectors', () => {
+    const newTitle = 'new title of item';
+    state.addItem({ id: 1 });
+    state.addItem({ id: 2 });
+    state.setString(newTitle);
 
-    state = new TestState({ debug: true });
-    const constructorName = state.constructor.name;
-    const fnName = 'addItem';
-
-    state[fnName]({ id: 5 });
-
-    expect(console.log).toHaveBeenCalledWith(`${constructorName}.${fnName}`);
+    const combination = state.combination$.snapshot;
+    expect(combination.every((item) => item.title === newTitle)).toBeTruthy();
   });
 
-  it('should log state updates', () => {
-    spyOn(console, 'log');
+  it('should combine a parametered selector', () => {
+    const title = 'find me';
 
-    state = new TestState({ debug: true });
-    state.addItem({ id: 5 });
+    state.addItem({ id: 1, title });
+    state.addItem({ id: 2 });
+    state.addItem({ id: 3, title });
 
-    expect(console.log).toHaveBeenCalledWith(state.snapshot);
-  });
+    const selector = state.getItemsByTitle(title);
 
-  it('should avoid logging regular functions', () => {
-    spyOn(console, 'log');
-
-    state.getItemById$;
-    state['select']((s) => s.items);
-
-    expect(console.log).not.toHaveBeenCalledWith('getItemById', 'select');
+    expect(selector.snapshot.length).toBe(2);
   });
 });

@@ -28,10 +28,7 @@
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
             "tsConfig": "projects/boiler-state/tsconfig.spec.json",
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ]
+            "polyfills": ["zone.js", "zone.js/testing"]
           }
         }
       }
@@ -40,7 +37,8 @@
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
-          "style": "scss"
+          "style": "scss",
+          "changeDetection": "OnPush"
         }
       },
       "root": "projects/minesweeper",
@@ -53,18 +51,11 @@
             "outputPath": "dist/minesweeper",
             "index": "projects/minesweeper/src/index.html",
             "main": "projects/minesweeper/src/main.ts",
-            "polyfills": [
-              "zone.js"
-            ],
+            "polyfills": ["zone.js"],
             "tsConfig": "projects/minesweeper/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
-            "assets": [
-              "projects/minesweeper/src/favicon.ico",
-              "projects/minesweeper/src/assets"
-            ],
-            "styles": [
-              "projects/minesweeper/src/styles.scss"
-            ],
+            "assets": ["projects/minesweeper/src/favicon.ico", "projects/minesweeper/src/assets"],
+            "styles": ["projects/minesweeper/src/styles.scss"],
             "scripts": []
           },
           "configurations": {
@@ -115,19 +106,11 @@
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ],
+            "polyfills": ["zone.js", "zone.js/testing"],
             "tsConfig": "projects/minesweeper/tsconfig.spec.json",
             "inlineStyleLanguage": "scss",
-            "assets": [
-              "projects/minesweeper/src/favicon.ico",
-              "projects/minesweeper/src/assets"
-            ],
-            "styles": [
-              "projects/minesweeper/src/styles.scss"
-            ],
+            "assets": ["projects/minesweeper/src/favicon.ico", "projects/minesweeper/src/assets"],
+            "styles": ["projects/minesweeper/src/styles.scss"],
             "scripts": []
           }
         }

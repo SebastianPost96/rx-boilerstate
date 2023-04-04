@@ -22,7 +22,7 @@ describe('State Logging', () => {
     state.noop;
     state.addItem;
     state.displayItems$;
-    state.snapshot;
+    state.asSelector().snapshot;
 
     expect(console.log).not.toHaveBeenCalled();
   });
@@ -31,7 +31,7 @@ describe('State Logging', () => {
     spyOn(console, 'log');
     state.addItem({ id: 5 });
 
-    expect(console.log).toHaveBeenCalledWith(state.constructor.name, state.snapshot);
+    expect(console.log).toHaveBeenCalledWith(state.constructor.name, state.asSelector().snapshot);
   });
 
   it('should not log built-in functions', () => {

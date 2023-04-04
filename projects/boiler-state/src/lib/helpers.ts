@@ -1,4 +1,4 @@
-import { MonoTypeOperatorFunction, Observable, shareReplay } from 'rxjs';
+import { MonoTypeOperatorFunction, Observable, distinctUntilChanged, shareReplay } from 'rxjs';
 import { Selector } from './types';
 import { State } from './state';
 
@@ -32,11 +32,19 @@ export function asSelector<T>(observable: Observable<T>): Selector<T> {
 }
 
 export function shareState<T>(): MonoTypeOperatorFunction<T> {
-  return shareReplay({ bufferSize: 0, refCount: true });
+  return (o: Observable<T>) => o.pipe(distinctUntilChanged(), shareReplay({ bufferSize: 0, refCount: true }));
 }
 
 export function logActions<S extends State<any>>(state: S): S {
-  deactivateLogging(state['select'], state['updateState'], state['destroy'], state['factory']);
+  deactivateLogging(
+    state['select'],
+    state['selectDynamic'],
+    state['updateState'],
+    state['destroy'],
+    state['derive'],
+    state['deriveDynamic'],
+    state['asSelector']
+  );
 
   return new Proxy(state, {
     get(target: any, propertyKey: keyof typeof target): unknown {

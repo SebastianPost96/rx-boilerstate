@@ -23,12 +23,12 @@ export class TestState extends State<TestInterface> {
   });
   displayItems$ = this.select((state) => state.displayItems);
   someString$ = this.select((state) => state.someString);
-  combination$ = this.select([this.items$, this.someString$], (items, str) =>
+  combination$ = this.derive([this.items$, this.someString$], (items, str) =>
     items.map((item) => ({ ...item, title: str }))
   );
 
-  getItemById = this.factory((state, id: number) => state.items.find((item) => item.id === id));
-  getItemsByTitle = this.factory([this.items$], ([items], title: string) =>
+  getItemById = this.selectDynamic((state, id: number) => state.items.find((item) => item.id === id));
+  getItemsByTitle = this.deriveDynamic([this.items$], ([items], title: string) =>
     items.filter((item) => item.title === title)
   );
 

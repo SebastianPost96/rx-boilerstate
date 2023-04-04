@@ -24,14 +24,14 @@ describe('General State Tests', () => {
     const str = 'howdy';
     state.setString(str);
 
-    expect(state.snapshot.someString).toBe(str);
+    expect(state.asSelector().snapshot.someString).toBe(str);
   });
 
   it('should reset state', () => {
     state.addItem({ id: 5 });
     state.reset();
 
-    expect(state.snapshot.items.length).toBe(0);
+    expect(state.asSelector().snapshot.items.length).toBe(0);
   });
 
   it('should combine two selectors', () => {

@@ -20,8 +20,8 @@ export abstract class State<S extends Record<string, any>> {
     }
   }
 
-  public get snapshot(): S {
-    return this.store.value;
+  public asSelector(): Selector<S> {
+    return asSelector(this.store);
   }
 
   public reset(): void {
@@ -37,44 +37,36 @@ export abstract class State<S extends Record<string, any>> {
     if (this.config.debug) console.log(this.constructor.name, this.store.value);
   }
 
-  protected select<T>(selectorFn: (state: S) => T): Selector<T>;
-  protected select<T, Args extends unknown[]>(
-    selectors: [...SelectorTuple<Args>],
-    selectorFn: (...args: Args) => T
-  ): Selector<T>;
-  protected select<T, TArgs extends unknown[]>(
-    selectorsOrFn: ((state: S) => T) | [...SelectorTuple<TArgs>],
-    selectorFn?: (...args: TArgs) => T
-  ): Selector<T> {
-    let selection: Observable<T>;
-
-    if (Array.isArray(selectorsOrFn)) {
-      if (!selectorFn) throw new Error('Selector function was not provided.');
-      selection = combineLatest(selectorsOrFn).pipe(map((args) => selectorFn(...(args as TArgs))));
-    } else {
-      selection = this.store.pipe(map(selectorsOrFn));
-    }
-
-    selection = selection.pipe(distinctUntilChanged(), shareState());
+  protected select<T>(selectorFn: (state: S) => T): Selector<T> {
+    const selection = this.store.pipe(map(selectorFn), shareState());
     return asSelector(selection);
   }
 
-  protected factory<T, FnArgs extends unknown[]>(
-    selectorFn: (state: S, ...fnArgs: FnArgs) => T
-  ): (...fnArgs: FnArgs) => Selector<T>;
-  protected factory<T, SelectorArgs extends unknown[], FnArgs extends unknown[]>(
+  protected selectDynamic<T, Args extends unknown[]>(
+    selectorFn: (state: S, ...fnArgs: Args) => T
+  ): (...fnArgs: Args) => Selector<T> {
+    const fn = (...args: Args) => this.select((state) => selectorFn(state, ...args));
+    deactivateLogging(fn);
+    return fn;
+  }
+
+  protected derive<T, Args extends unknown[]>(
+    selectors: [...SelectorTuple<Args>],
+    selectorFn: (...args: Args) => T
+  ): Selector<T> {
+    const observable = combineLatest(selectors).pipe(
+      map((args) => selectorFn(...(args as Args))),
+      shareState()
+    );
+    return asSelector(observable);
+  }
+
+  protected deriveDynamic<T, SelectorArgs extends unknown[], FnArgs extends unknown[]>(
     selectors: [...SelectorTuple<SelectorArgs>],
     selectorFn: (selectorArgs: SelectorArgs, ...fnArgs: FnArgs) => T
-  ): (...fnArgs: FnArgs) => Selector<T>;
-  protected factory<T, SelectorArgs extends unknown[], FnArgs extends unknown[]>(
-    selectorsOrFn: ((state: S, ...args: FnArgs) => T) | [...SelectorTuple<SelectorArgs>],
-    selectorFn?: (selectorArgs: SelectorArgs, ...fnArgs: FnArgs) => T
-  ) {
-    const factoryFn = Array.isArray(selectorsOrFn)
-      ? (...fnArgs: FnArgs) => this.select(selectorsOrFn, (...sArgs: SelectorArgs) => selectorFn!(sArgs, ...fnArgs))
-      : (...args: FnArgs) => this.select((state) => selectorsOrFn(state, ...args));
-    deactivateLogging(factoryFn);
-
-    return factoryFn;
+  ): (...fnArgs: FnArgs) => Selector<T> {
+    const fn = (...fnArgs: FnArgs) => this.derive(selectors, (...sArgs: SelectorArgs) => selectorFn(sArgs, ...fnArgs));
+    deactivateLogging(fn);
+    return fn;
   }
 }

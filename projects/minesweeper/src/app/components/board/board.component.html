@@ -1,0 +1,5 @@
+<ng-container *ngIf="state.tiles$ | async as tiles">
+  <div class="row" *ngFor="let row of tiles; trackBy: byIndex">
+    <app-tile *ngFor="let tile of row; trackBy: byIndex" [tile]="tile"></app-tile>
+  </div>
+</ng-container>

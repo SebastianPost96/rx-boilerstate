@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
+import { State } from 'projects/boiler-state/src/public-api';
+import { GAME_CONFIGS } from '../constants/game-configs';
 import { Difficulty } from '../models/difficulty';
 import { GameProcess } from '../models/game-process';
-import { Tile } from '../models/tile';
-import { GameConfig } from '../models/game-config';
-import { GAME_CONFIGS } from '../constants/game-configs';
-import { State } from 'projects/boiler-state/src/public-api';
+import { Point, Tile } from '../models/tile';
 
 interface GameModel {
   process: GameProcess;
@@ -15,34 +14,64 @@ interface GameModel {
 @Injectable({ providedIn: 'root' })
 export class GameState extends State<GameModel> {
   constructor() {
-    super({ process: 'start', tiles: [], difficulty: 'Beginner' }, { debug: true });
+    super({ process: GameProcess.Start, tiles: [], difficulty: Difficulty.Beginner }, { debug: true });
   }
 
-  // #region Selectors
   public process$ = this.select(({ process }) => process);
   public tiles$ = this.select(({ tiles }) => tiles);
   public difficulty$ = this.select(({ difficulty }) => difficulty);
-  // #endregion
 
-  // #region Selector Factories
+  public adjacentTiles = this.deriveDynamic(this.tiles$, ([tiles], { x, y }: Point) => {
+    return [
+      tiles[y - 1]?.[x - 1],
+      tiles[y - 1]?.[x],
+      tiles[y - 1]?.[x + 1],
+      tiles[y]?.[x - 1],
+      tiles[y]?.[x + 1],
+      tiles[y + 1]?.[x - 1],
+      tiles[y + 1]?.[x],
+      tiles[y + 1]?.[x + 1],
+    ].filter((tile) => tile);
+  });
 
-  // #endregion
-
-  // #region Actions
   public startGame(): void {
     this.updateState((state) => {
-      function generateTiles(setting: GameConfig) {
-        state.tiles = [];
-        for (let y = 0; y < setting.dimensions.y; y++) {
-          state.tiles[y] = [];
-          for (let x = 0; x < setting.dimensions.x; x++) {
-            state.tiles[y][x] = { isBomb: false, isFlagged: false, location: { x, y }, revealed: false };
-          }
+      const { dimensions, mines } = GAME_CONFIGS[state.difficulty];
+
+      state.tiles = [];
+      for (let y = 0; y < dimensions.y; y++) {
+        state.tiles[y] = [];
+        for (let x = 0; x < dimensions.x; x++) {
+          state.tiles[y][x] = { isMine: false, isFlagged: false, location: { x, y }, revealed: false };
         }
       }
 
-      const config = GAME_CONFIGS[state.difficulty];
-      generateTiles(config);
+      for (let i = 0; i < mines; i++) {
+        setRandomMine(state.tiles);
+      }
+
+      state.process = GameProcess.Playing;
+    });
+  }
+
+  public revealTile(location: Point): void {
+    this.updateState((state) => {
+      const tile = state.tiles[location.y][location.x];
+      const isFirstTile = () => state.tiles.every((array) => array.every((item) => !item.revealed));
+      if (tile.isMine && isFirstTile()) {
+        setRandomMine(state.tiles);
+        tile.isMine = false;
+      }
+      tile.revealed = true;
+    });
+
+    // TODO: reveal adjacent tiles
+  }
+
+  public flagTile(location: Point): void {
+    this.updateState((state) => {
+      const tile = state.tiles[location.y][location.x];
+      tile.isFlagged = !tile.isFlagged;
     });
   }
 
@@ -57,5 +86,17 @@ export class GameState extends State<GameModel> {
       state.process = process;
     });
   }
-  // #endregion
+}
+
+function setRandomMine(tiles: Tile[][]): void {
+  function getRandomInt(max: number) {
+    return Math.floor(Math.random() * max);
+  }
+
+  const selectedTile = tiles[getRandomInt(tiles.length)][getRandomInt(tiles[0].length)];
+  if (selectedTile.isMine) {
+    setRandomMine(tiles);
+  } else {
+    selectedTile.isMine = true;
+  }
 }

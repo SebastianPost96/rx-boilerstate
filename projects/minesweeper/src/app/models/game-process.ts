@@ -1,1 +1,6 @@
-export type GameProcess = 'start' | 'playing' | 'gameover' | 'win';
+export enum GameProcess {
+  Start,
+  Playing,
+  Gameover,
+  Win,
+}

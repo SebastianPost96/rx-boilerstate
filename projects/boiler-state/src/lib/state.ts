@@ -50,7 +50,7 @@ export abstract class State<S extends Record<string, any>> {
     return fn;
   }
 
-  protected derive<T, Args extends unknown[]>(...args: [...SelectorTuple<Args>, (...args: Args) => T]): Selector<T> {
+  public derive<T, Args extends unknown[]>(...args: [...SelectorTuple<Args>, (...args: Args) => T]): Selector<T> {
     const selectorFn = args.at(-1) as (...args: Args) => T;
     const selectors = args.slice(0, args.length - 1) as SelectorTuple<Args>;
 
@@ -61,7 +61,7 @@ export abstract class State<S extends Record<string, any>> {
     return asSelector(observable);
   }
 
-  protected deriveDynamic<T, SelectorArgs extends unknown[], FnArgs extends unknown[]>(
+  public deriveDynamic<T, SelectorArgs extends unknown[], FnArgs extends unknown[]>(
     ...args: [...SelectorTuple<SelectorArgs>, (selectorArgs: SelectorArgs, ...fnArgs: FnArgs) => T]
   ): (...fnArgs: FnArgs) => Selector<T> {
     const selectorFn = args.at(-1) as (selectorArgs: SelectorArgs, ...fnArgs: FnArgs) => T;

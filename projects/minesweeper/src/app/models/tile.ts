@@ -1,6 +1,11 @@
 export interface Tile {
   isFlagged: boolean;
-  isBomb: boolean;
-  location: { x: number; y: number };
+  isMine: boolean;
+  location: Point;
   revealed: boolean;
+}
+
+export interface Point {
+  x: number;
+  y: number;
 }

@@ -50,10 +50,10 @@ export abstract class State<S extends Record<string, any>> {
     return fn;
   }
 
-  protected derive<T, Args extends unknown[]>(
-    selectors: [...SelectorTuple<Args>],
-    selectorFn: (...args: Args) => T
-  ): Selector<T> {
+  protected derive<T, Args extends unknown[]>(...args: [...SelectorTuple<Args>, (...args: Args) => T]): Selector<T> {
+    const selectorFn = args.at(-1) as (...args: Args) => T;
+    const selectors = args.slice(0, args.length - 1) as SelectorTuple<Args>;
+
     const observable = combineLatest(selectors).pipe(
       map((args) => selectorFn(...(args as Args))),
       shareState()
@@ -62,10 +62,13 @@ export abstract class State<S extends Record<string, any>> {
   }
 
   protected deriveDynamic<T, SelectorArgs extends unknown[], FnArgs extends unknown[]>(
-    selectors: [...SelectorTuple<SelectorArgs>],
-    selectorFn: (selectorArgs: SelectorArgs, ...fnArgs: FnArgs) => T
+    ...args: [...SelectorTuple<SelectorArgs>, (selectorArgs: SelectorArgs, ...fnArgs: FnArgs) => T]
   ): (...fnArgs: FnArgs) => Selector<T> {
-    const fn = (...fnArgs: FnArgs) => this.derive(selectors, (...sArgs: SelectorArgs) => selectorFn(sArgs, ...fnArgs));
+    const selectorFn = args.at(-1) as (selectorArgs: SelectorArgs, ...fnArgs: FnArgs) => T;
+    const selectors = args.slice(0, args.length - 1) as SelectorTuple<SelectorArgs>;
+
+    const fn = (...fnArgs: FnArgs) =>
+      this.derive(...selectors, (...sArgs: SelectorArgs) => selectorFn(sArgs, ...fnArgs));
     deactivateLogging(fn);
     return fn;
   }

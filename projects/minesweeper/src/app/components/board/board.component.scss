@@ -17,7 +17,6 @@
       &:first-child,
       &:last-child {
         box-shadow: 0 0px 3px 1px grey;
-        color: red;
       }
 
       .ng-icon {
@@ -29,6 +28,9 @@
         }
         &.win {
           filter: none;
+        }
+        &.loss {
+          transform: rotate(90deg);
         }
       }
     }

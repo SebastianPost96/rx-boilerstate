@@ -16,6 +16,7 @@
         [height]="30"
         [width]="30"
         [class.win]="state.process === gameProcess.Win"
+        [class.loss]="state.process === gameProcess.GameOver"
         (click)="gameState.startGame()"
       />
     </div>

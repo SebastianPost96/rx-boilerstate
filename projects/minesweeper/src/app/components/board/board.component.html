@@ -1,5 +1,8 @@
-<ng-container *ngIf="state.tiles$ | async as tiles">
-  <div class="row" *ngFor="let row of tiles; trackBy: byIndex">
+<div
+  *ngIf="{ grid: (gameState.grid$ | async)!, process: (gameState.process$ | async)! } as state"
+  [style.pointer-events]="[gameProcess.GameOver, gameProcess.Win].includes(state.process) ? 'none' : null"
+>
+  <div class="row" *ngFor="let row of state.grid; trackBy: byIndex">
     <app-tile *ngFor="let tile of row; trackBy: byIndex" [tile]="tile"></app-tile>
   </div>
-</ng-container>
+</div>

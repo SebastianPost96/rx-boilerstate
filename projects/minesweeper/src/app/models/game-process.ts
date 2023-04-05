@@ -1,6 +1,6 @@
 export enum GameProcess {
   Start,
   Playing,
-  Gameover,
+  GameOver,
   Win,
 }

@@ -1,6 +1,8 @@
-<img
-  [src]="tile | tileIcon : (adjacentMines$ | async) ?? 0"
-  [height]="20"
-  [width]="20"
-  [class.revealed]="tile.revealed"
-/>
+<div
+  *ngIf="{
+    mouseOver: (mouseOverHandler$ | async)!,
+    adjacentMines: (adjacentMines$ | async)!,
+    gameProcess: (state.process$ | async)!
+  } as state"
+  [style.background-image]="tile | tileImage : !!state.mouseOver : state.adjacentMines : state.gameProcess"
+></div>

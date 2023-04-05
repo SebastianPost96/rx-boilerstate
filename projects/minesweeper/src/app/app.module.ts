@@ -5,10 +5,10 @@ import { AppComponent } from './app.component';
 import { BoardComponent } from './components/board/board.component';
 import { TileComponent } from './components/tile/tile.component';
 import { NgOptimizedImage } from '@angular/common';
-import { TileIconPipe } from './pipes/tile-icon.pipe';
+import { TileImagePipe } from './pipes/tile-image.pipe';
 
 @NgModule({
-  declarations: [AppComponent, BoardComponent, TileComponent, TileIconPipe],
+  declarations: [AppComponent, BoardComponent, TileComponent, TileImagePipe],
   imports: [BrowserModule, NgOptimizedImage],
   providers: [],
   bootstrap: [AppComponent],

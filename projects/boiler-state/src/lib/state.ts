@@ -5,40 +5,40 @@ import { asSelector, deactivateLogging, logActions, shareState } from './helpers
 import { Selector, SelectorTuple, StateConfig } from './types';
 
 export abstract class State<S extends Record<string, any>> {
-  private readonly store: BehaviorSubject<S>;
-  private readonly defaults: S;
+  private readonly _store: BehaviorSubject<S>;
+  private readonly _defaults: S;
 
-  protected constructor(defaults: S, private readonly config: StateConfig = {}) {
-    this.defaults = produce(defaults, (s) => s);
-    this.store = new BehaviorSubject(this.defaults);
+  protected constructor(defaults: S, private readonly _config: StateConfig = {}) {
+    this._defaults = produce(defaults, (s) => s);
+    this._store = new BehaviorSubject(this._defaults);
 
     // set config defaults
-    this.config.debug ??= false;
+    this._config.debug ??= false;
 
-    if (this.config.debug) {
+    if (this._config.debug) {
       return logActions(this);
     }
   }
 
   public asSelector(): Selector<S> {
-    return asSelector(this.store);
+    return asSelector(this._store);
   }
 
   public reset(): void {
-    this.updateState(() => this.defaults);
+    this.updateState(() => this._defaults);
   }
 
   public destroy(): void {
-    this.store.complete();
+    this._store.complete();
   }
 
   protected updateState(recipe: (currentState: S) => S | void | undefined): void {
-    this.store.next(produce(this.store.value, recipe));
-    if (this.config.debug) console.log(this.constructor.name, this.store.value);
+    this._store.next(produce(this._store.value, recipe));
+    if (this._config.debug) console.log(this.constructor.name, this._store.value);
   }
 
   protected select<T>(selectorFn: (state: S) => T): Selector<T> {
-    const selection = this.store.pipe(map(selectorFn), shareState());
+    const selection = this._store.pipe(map(selectorFn), shareState());
     return asSelector(selection);
   }
 

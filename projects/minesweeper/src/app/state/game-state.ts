@@ -4,7 +4,7 @@ import { GAME_CONFIGS } from '../constants/game-configs';
 import { Difficulty } from '../models/difficulty';
 import { GameProcess } from '../models/game-process';
 import { Point, Tile } from '../models/tile';
-import { getAdjacentMines, getAdjacentTiles, isSafe, setRandomMine } from './helpers';
+import { getAdjacentMines, revealSafeAdjacentTiles, setRandomMine } from './helpers';
 
 interface GameModel {
   process: GameProcess;
@@ -15,7 +15,7 @@ interface GameModel {
 @Injectable({ providedIn: 'root' })
 export class GameState extends State<GameModel> {
   constructor() {
-    super({ process: GameProcess.Start, grid: [], difficulty: Difficulty.Expert });
+    super({ process: GameProcess.Start, grid: [], difficulty: Difficulty.Beginner });
   }
 
   public process$ = this.select(({ process }) => process);
@@ -55,15 +55,6 @@ export class GameState extends State<GameModel> {
 
   public revealTile(location: Point): void {
     this.updateState((state) => {
-      function revealSafeAdjacentTiles(tile: Tile) {
-        if (!isSafe(state.grid, tile)) return;
-        const tilesToReveal = getAdjacentTiles(state.grid, tile).filter((t) => !t.revealed);
-        tilesToReveal.forEach((t) => {
-          t.revealed = true;
-          revealSafeAdjacentTiles(t);
-        });
-      }
-
       const tile = state.grid[location.y][location.x];
       const isFirstTile = () => state.grid.every((array) => array.every((item) => !item.revealed));
       if (tile.isMine && isFirstTile()) {
@@ -71,9 +62,15 @@ export class GameState extends State<GameModel> {
         tile.isMine = false;
       }
       tile.revealed = true;
-      revealSafeAdjacentTiles(tile);
+      revealSafeAdjacentTiles(state.grid, tile);
 
-      if (tile.isMine) state.process = GameProcess.GameOver;
+      if (tile.isMine) {
+        state.process = GameProcess.GameOver;
+        return;
+      }
+
+      const gameWon = state.grid.flat().every((t) => t.isMine || t.revealed);
+      if (gameWon) state.process = GameProcess.Win;
     });
   }
 
@@ -85,14 +82,14 @@ export class GameState extends State<GameModel> {
   }
 
   public setDifficulty(difficulty: Difficulty): void {
+    const difficultyChanged = difficulty !== this.asSelector().snapshot.difficulty;
+
     this.updateState((state) => {
       state.difficulty = difficulty;
     });
-  }
 
-  public setProcess(process: GameProcess): void {
-    this.updateState((state) => {
-      state.process = process;
-    });
+    if (difficultyChanged) {
+      this.startGame();
+    }
   }
 }

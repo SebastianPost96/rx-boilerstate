@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { GameState } from './state/game-state';
+import { Difficulty } from './models/difficulty';
 
 @Component({
   selector: 'app-root',
@@ -8,5 +9,8 @@ import { GameState } from './state/game-state';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
-  constructor(public state: GameState) {}
+  public difficulties = Object.values(Difficulty);
+  constructor(public state: GameState) {
+    state.startGame();
+  }
 }

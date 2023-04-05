@@ -1,14 +1,33 @@
-<ng-container
+<div
   *ngIf="{
     grid: (gameState.grid$ | async)!,
     process: (gameState.process$ | async)!,
     remainingMines: (gameState.remainingMines$ | async)!
   } as state"
+  class="board-container"
 >
-  {{ state.remainingMines }}
-  <div [style.pointer-events]="[gameProcess.GameOver, gameProcess.Win].includes(state.process) ? 'none' : null">
+  <div class="header">
+    <div>{{ state.process === gameProcess.Win ? 0 : state.remainingMines }}</div>
+    <div>
+      <img
+        draggable="false"
+        class="ng-icon"
+        [ngSrc]="'/assets/angular.png'"
+        [height]="30"
+        [width]="30"
+        [class.win]="state.process === gameProcess.Win"
+        (click)="gameState.startGame()"
+      />
+    </div>
+    <div>Time</div>
+  </div>
+
+  <div
+    class="game-container"
+    [style.pointer-events]="[gameProcess.GameOver, gameProcess.Win].includes(state.process) ? 'none' : null"
+  >
     <div class="row" *ngFor="let row of state.grid; trackBy: byIndex">
       <app-tile *ngFor="let tile of row; trackBy: byIndex" [tile]="tile"></app-tile>
     </div>
   </div>
-</ng-container>
+</div>

@@ -1,3 +1,13 @@
-<button (click)="state.startGame()">Start Game</button>
+<div class="app-container">
+  <div class="buttons">
+    <button
+      *ngFor="let difficulty of difficulties"
+      (click)="state.setDifficulty(difficulty)"
+      [disabled]="difficulty === (state.difficulty$ | async)"
+    >
+      {{ difficulty }}
+    </button>
+  </div>
 
-<app-board></app-board>
+  <app-board *ngIf="(state.process$ | async)! > 0"></app-board>
+</div>

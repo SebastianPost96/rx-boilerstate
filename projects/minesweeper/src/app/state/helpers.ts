@@ -1,4 +1,4 @@
-import { Point, Tile } from '../models/tile';
+import { Tile } from '../models/tile';
 
 export function setRandomMine(tiles: Tile[][]): void {
   function getRandomInt(max: number) {
@@ -35,4 +35,13 @@ export function getAdjacentMines(grid: Tile[][], tile: Tile): number {
 
 export function isSafe(grid: Tile[][], tile: Tile): boolean {
   return !tile.isMine && !getAdjacentMines(grid, tile);
+}
+
+export function revealSafeAdjacentTiles(grid: Tile[][], tile: Tile) {
+  if (!isSafe(grid, tile)) return;
+  const tilesToReveal = getAdjacentTiles(grid, tile).filter((t) => !t.revealed);
+  tilesToReveal.forEach((t) => {
+    t.revealed = true;
+    revealSafeAdjacentTiles(grid, t);
+  });
 }

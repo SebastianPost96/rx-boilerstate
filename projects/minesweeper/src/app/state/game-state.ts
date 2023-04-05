@@ -22,6 +22,15 @@ export class GameState extends State<GameModel> {
   public grid$ = this.select(({ grid }) => grid);
   public difficulty$ = this.select(({ difficulty }) => difficulty);
 
+  public remainingMines$ = this.derive(this.grid$, (grid) => {
+    let mines = 0;
+    let flags = 0;
+    for (const tile of grid.flat()) {
+      if (tile.isMine) mines++;
+      if (tile.isFlagged) flags++;
+    }
+    return mines - flags;
+  });
   public adjacentMines = this.deriveDynamic(this.grid$, ([grid], tile: Tile) => getAdjacentMines(grid, tile));
 
   public startGame(): void {

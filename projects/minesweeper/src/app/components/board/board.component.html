@@ -1,8 +1,14 @@
-<div
-  *ngIf="{ grid: (gameState.grid$ | async)!, process: (gameState.process$ | async)! } as state"
-  [style.pointer-events]="[gameProcess.GameOver, gameProcess.Win].includes(state.process) ? 'none' : null"
+<ng-container
+  *ngIf="{
+    grid: (gameState.grid$ | async)!,
+    process: (gameState.process$ | async)!,
+    remainingMines: (gameState.remainingMines$ | async)!
+  } as state"
 >
-  <div class="row" *ngFor="let row of state.grid; trackBy: byIndex">
-    <app-tile *ngFor="let tile of row; trackBy: byIndex" [tile]="tile"></app-tile>
+  {{ state.remainingMines }}
+  <div [style.pointer-events]="[gameProcess.GameOver, gameProcess.Win].includes(state.process) ? 'none' : null">
+    <div class="row" *ngFor="let row of state.grid; trackBy: byIndex">
+      <app-tile *ngFor="let tile of row; trackBy: byIndex" [tile]="tile"></app-tile>
+    </div>
   </div>
-</div>
+</ng-container>

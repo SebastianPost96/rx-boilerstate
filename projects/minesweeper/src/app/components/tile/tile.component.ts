@@ -1,6 +1,15 @@
-import { ChangeDetectionStrategy, Component, ElementRef, HostListener, Input, NgZone, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  NgZone,
+  OnDestroy,
+  OnInit,
+} from '@angular/core';
 import { Selector } from 'projects/boiler-state/src/public-api';
-import { Observable, combineLatest, distinctUntilChanged, fromEvent, map, merge, startWith } from 'rxjs';
+import { Observable, distinctUntilChanged, fromEvent, map, merge, startWith, takeUntil } from 'rxjs';
 import { Tile } from '../../models/tile';
 import { GameState } from '../../state/game-state';
 
@@ -10,16 +19,18 @@ import { GameState } from '../../state/game-state';
   styleUrls: ['./tile.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TileComponent implements OnInit {
+export class TileComponent implements OnInit, OnDestroy {
   @Input() tile!: Tile;
 
+  private _destroy$ = new EventEmitter<void>();
+
   public adjacentMines$?: Selector<number>;
-  public mouseOverHandler$?: Observable<boolean> = this.zone.runOutsideAngular(() =>
+  public mouseOverHandler$?: Observable<boolean> = this._zone.runOutsideAngular(() =>
     merge(
-      fromEvent(this.hostElement.nativeElement, 'mouseup'),
-      fromEvent(this.hostElement.nativeElement, 'mousedown'),
-      fromEvent(this.hostElement.nativeElement, 'mouseenter'),
-      fromEvent(this.hostElement.nativeElement, 'mouseleave')
+      fromEvent(this._hostElement.nativeElement, 'mouseup'),
+      fromEvent(this._hostElement.nativeElement, 'mousedown'),
+      fromEvent(this._hostElement.nativeElement, 'mouseenter'),
+      fromEvent(this._hostElement.nativeElement, 'mouseleave')
     ).pipe(
       map((event) => {
         if (!(event instanceof MouseEvent)) throw new Error();
@@ -30,28 +41,48 @@ export class TileComponent implements OnInit {
     )
   );
 
-  @HostListener('mouseup', ['$event'])
-  revealTile(event: MouseEvent): void {
+  constructor(public state: GameState, private _hostElement: ElementRef, private _zone: NgZone) {}
+
+  ngOnInit(): void {
+    this.adjacentMines$ = this.state.adjacentMines(this.tile);
+
+    this._zone.runOutsideAngular(() =>
+      fromEvent(this._hostElement.nativeElement, 'contextmenu')
+        .pipe(takeUntil(this._destroy$))
+        .subscribe((evt) => this._blockContextMenu(evt as MouseEvent))
+    );
+
+    this._zone.runOutsideAngular(() =>
+      fromEvent(this._hostElement.nativeElement, 'mousedown')
+        .pipe(takeUntil(this._destroy$))
+        .subscribe((evt) => this._flagTile(evt as MouseEvent))
+    );
+
+    this._zone.runOutsideAngular(() =>
+      fromEvent(this._hostElement.nativeElement, 'mouseup')
+        .pipe(takeUntil(this._destroy$))
+        .subscribe((evt) => this._revealTile(evt as MouseEvent))
+    );
+  }
+
+  ngOnDestroy(): void {
+    this._destroy$.next();
+    this._destroy$.complete();
+  }
+
+  private _revealTile(event: MouseEvent): void {
     if (event.button !== 0) return;
     if (this.tile.isFlagged || this.tile.revealed) return;
     this.state.revealTile(this.tile.location);
   }
 
-  @HostListener('mousedown', ['$event'])
-  flagTile(event: MouseEvent): void {
+  private _flagTile(event: MouseEvent): void {
     if (this.tile.revealed) return;
     if (event.button !== 2) return;
     this.state.flagTile(this.tile.location);
   }
 
-  @HostListener('contextmenu', ['$event'])
-  blockContextMenu(event: MouseEvent): void {
+  private _blockContextMenu(event: MouseEvent): void {
     event.preventDefault();
-  }
-
-  constructor(public state: GameState, private hostElement: ElementRef, private zone: NgZone) {}
-
-  ngOnInit(): void {
-    this.adjacentMines$ = this.state.adjacentMines(this.tile);
   }
 }

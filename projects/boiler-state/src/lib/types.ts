@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs';
 
-/** An Observable that is able to retrieve a snapshot of its current value. */
+/** An Observable that can retrieve a snapshot of its current value. */
 export type Selector<T> = Observable<T> & {
   /** A synchronous snapshot of the current Observable value, retrieved by momentarily subscribing to it. */
   readonly snapshot: T;

@@ -94,11 +94,13 @@ export abstract class State<S extends Record<string, any>> {
    * ```
    * @returns A Selector of the supplied function's return value.
    */
-  protected derive<T, Args extends unknown[]>(...args: [...SelectorTuple<Args>, (...args: Args) => T]): Selector<T> {
+  protected derive<T, Args extends unknown[]>(
+    ...args: [...SelectorTuple<Args>, (...functionArgs: Args) => T]
+  ): Selector<T> {
     const selectorFn = args.at(-1) as (...args: Args) => T;
     const selectors = args.slice(0, args.length - 1) as SelectorTuple<Args>;
 
-    const observable = combineLatest(selectors).pipe(map((args) => selectorFn(...(args as Args))));
+    const observable = combineLatest(selectors).pipe(map((functionArgs) => selectorFn(...(functionArgs as Args))));
     return asSelector(observable);
   }
 }

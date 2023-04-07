@@ -3,23 +3,23 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "boiler-state": {
+    "rx-boilerstate": {
       "projectType": "library",
-      "root": "projects/boiler-state",
-      "sourceRoot": "projects/boiler-state/src",
+      "root": "projects/rx-boilerstate",
+      "sourceRoot": "projects/rx-boilerstate/src",
       "prefix": "lib",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:ng-packagr",
           "options": {
-            "project": "projects/boiler-state/ng-package.json"
+            "project": "projects/rx-boilerstate/ng-package.json"
           },
           "configurations": {
             "production": {
-              "tsConfig": "projects/boiler-state/tsconfig.lib.prod.json"
+              "tsConfig": "projects/rx-boilerstate/tsconfig.lib.prod.json"
             },
             "development": {
-              "tsConfig": "projects/boiler-state/tsconfig.lib.json"
+              "tsConfig": "projects/rx-boilerstate/tsconfig.lib.json"
             }
           },
           "defaultConfiguration": "production"
@@ -27,7 +27,7 @@
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "tsConfig": "projects/boiler-state/tsconfig.spec.json",
+            "tsConfig": "projects/rx-boilerstate/tsconfig.spec.json",
             "polyfills": ["zone.js", "zone.js/testing"]
           }
         }

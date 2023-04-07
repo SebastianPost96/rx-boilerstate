@@ -4,9 +4,7 @@
   "compilerOptions": {
     "baseUrl": "./",
     "paths": {
-      "boiler-state": [
-        "dist/boiler-state"
-      ]
+      "rx-boilerstate": ["dist/rx-boilerstate"]
     },
     "outDir": "./dist/out-tsc",
     "forceConsistentCasingInFileNames": true,
@@ -24,10 +22,7 @@
     "target": "ES2022",
     "module": "ES2022",
     "useDefineForClassFields": false,
-    "lib": [
-      "ES2022",
-      "dom"
-    ]
+    "lib": ["ES2022", "dom"]
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

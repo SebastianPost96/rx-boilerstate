@@ -8,7 +8,7 @@ import {
   OnDestroy,
   OnInit,
 } from '@angular/core';
-import { Selector } from 'projects/boiler-state/src/public-api';
+import { Selector } from 'projects/rx-boilerstate/src/public-api';
 import { Observable, distinctUntilChanged, fromEvent, map, merge, startWith, takeUntil } from 'rxjs';
 import { Tile } from '../../models/tile';
 import { GameState } from '../../state/game-state';

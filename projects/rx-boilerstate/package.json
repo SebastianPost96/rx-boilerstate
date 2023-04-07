@@ -1,5 +1,5 @@
 {
-  "name": "boiler-state",
+  "name": "rx-boilerstate",
   "version": "0.0.3",
   "peerDependencies": {
     "rxjs": "^6.5.5 || ^7.4.0",

@@ -1,6 +1,6 @@
 {
   "name": "boiler-state",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "peerDependencies": {
     "rxjs": "^6.5.5 || ^7.4.0",
     "immer": ">=9.0.0"

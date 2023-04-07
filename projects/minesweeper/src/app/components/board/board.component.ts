@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
+import { tap } from 'rxjs';
 import { GameProcess } from '../../models/game-process';
 import { GameState } from '../../state/game-state';
-import { filter, interval, map, of, startWith, switchMap, takeUntil, tap } from 'rxjs';
 
 @Component({
   selector: 'app-board',

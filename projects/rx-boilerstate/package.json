@@ -1,6 +1,6 @@
 {
   "name": "rx-boilerstate",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "peerDependencies": {
     "rxjs": "^6.5.5 || ^7.4.0",
     "immer": ">=9.0.0"
@@ -22,5 +22,12 @@
     "ngx",
     "lightweight"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SebastianPost96/rx-boilerstate"
+  },
+  "bugs": {
+    "url": "https://github.com/SebastianPost96/rx-boilerstate/issues"
+  }
 }

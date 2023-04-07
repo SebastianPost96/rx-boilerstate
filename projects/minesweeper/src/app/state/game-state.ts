@@ -36,6 +36,7 @@ export class GameState extends State<GameModel> {
     return mines - flags;
   });
 
+  // example of rxjs interop
   public timer$ = this.process$.pipe(
     filter((process) => process === GameProcess.Playing || process === GameProcess.Start),
     switchMap((process) =>
@@ -48,7 +49,6 @@ export class GameState extends State<GameModel> {
           )
     )
   );
-
   // example of custom change detection
   private adjacentTiles = (tile: Tile) =>
     this.derive(this.grid$, (grid) => getAdjacentTiles(grid, tile)).defineChange('shallow');

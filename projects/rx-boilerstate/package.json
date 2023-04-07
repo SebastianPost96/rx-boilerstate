@@ -8,5 +8,19 @@
   "dependencies": {
     "tslib": "^2.3.0"
   },
-  "sideEffects": false
+  "sideEffects": false,
+  "author": "Sebastian Post",
+  "description": "Minimalistic and scalabe state management for Angular. Reduce complexity and boilerplate code in your applications. Built with RxJS.",
+  "keywords": [
+    "RxJS",
+    "State",
+    "Angular",
+    "CQRS",
+    "Store",
+    "Event Stream",
+    "ng",
+    "ngx",
+    "lightweight"
+  ],
+  "license": "MIT"
 }

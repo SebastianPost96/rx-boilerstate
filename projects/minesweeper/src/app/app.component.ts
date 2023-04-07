@@ -11,6 +11,6 @@ import { Difficulty } from './models/difficulty';
 export class AppComponent {
   public difficulties = Object.values(Difficulty);
   constructor(public state: GameState) {
-    state.startGame();
+    state.generateNewBoard();
   }
 }

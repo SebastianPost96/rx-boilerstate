@@ -2,12 +2,13 @@
   *ngIf="{
     grid: (gameState.grid$ | async)!,
     process: (gameState.process$ | async)!,
-    remainingMines: (gameState.remainingMines$ | async)!
+    remainingMines: (gameState.remainingMines$ | async)!,
+    timer: (gameState.timer$ | async) ?? 0
   } as state"
   class="board-container"
 >
   <div class="header">
-    <div>{{ state.process === gameProcess.Win ? 0 : state.remainingMines }}</div>
+    <div>{{ state.remainingMines }}</div>
     <div>
       <img
         draggable="false"
@@ -17,10 +18,10 @@
         [width]="30"
         [class.win]="state.process === gameProcess.Win"
         [class.loss]="state.process === gameProcess.GameOver"
-        (click)="gameState.startGame()"
+        (click)="gameState.generateNewBoard()"
       />
     </div>
-    <div>Time</div>
+    <div>{{ state.timer }}</div>
   </div>
 
   <div

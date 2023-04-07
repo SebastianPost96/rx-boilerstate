@@ -4,7 +4,8 @@ import { GAME_CONFIGS } from '../constants/game-configs';
 import { Difficulty } from '../models/difficulty';
 import { GameProcess } from '../models/game-process';
 import { Point, Tile } from '../models/tile';
-import { getAdjacentMines, revealSafeAdjacentTiles, setRandomMine } from './helpers';
+import { getAdjacentTiles, revealSafeAdjacentTiles, setRandomMine } from './helpers';
+import { interval, map } from 'rxjs';
 
 interface GameModel {
   process: GameProcess;
@@ -22,7 +23,10 @@ export class GameState extends State<GameModel> {
   public grid$ = this.select(({ grid }) => grid);
   public difficulty$ = this.select(({ difficulty }) => difficulty);
 
-  public remainingMines$ = this.derive(this.grid$, (grid) => {
+  public remainingMines$ = this.derive(this.grid$, this.process$, this.difficulty$, (grid, process, difficulty) => {
+    if (process === GameProcess.Start) return GAME_CONFIGS[difficulty].mines;
+    if (process === GameProcess.Win) return 0;
+
     let mines = 0;
     let flags = 0;
     for (const tile of grid.flat()) {
@@ -31,9 +35,16 @@ export class GameState extends State<GameModel> {
     }
     return mines - flags;
   });
-  public adjacentMines = this.deriveDynamic(this.grid$, ([grid], tile: Tile) => getAdjacentMines(grid, tile));
+  public timer$ = interval(1000).pipe(map((i) => i + 1));
 
-  public startGame(): void {
+  // example of custom change detection
+  private adjacentTiles = (tile: Tile) =>
+    this.derive(this.grid$, (grid) => getAdjacentTiles(grid, tile)).defineChange('shallow');
+  // example of deriving dynamic state
+  public adjacentMines = (tile: Tile) =>
+    this.derive(this.adjacentTiles(tile), (tiles) => tiles.filter((t) => t.isMine).length);
+
+  public generateNewBoard(): void {
     this.updateState((state) => {
       const { dimensions, mines } = GAME_CONFIGS[state.difficulty];
 
@@ -49,18 +60,23 @@ export class GameState extends State<GameModel> {
         setRandomMine(state.grid);
       }
 
-      state.process = GameProcess.Playing;
+      state.process = GameProcess.Start;
     });
   }
 
   public revealTile(location: Point): void {
     this.updateState((state) => {
       const tile = state.grid[location.y][location.x];
-      const isFirstTile = () => state.grid.every((array) => array.every((item) => !item.revealed));
-      if (tile.isMine && isFirstTile()) {
-        setRandomMine(state.grid);
-        tile.isMine = false;
+
+      // start game on first click
+      if (state.process === GameProcess.Start) {
+        state.process = GameProcess.Playing;
+        if (tile.isMine) {
+          setRandomMine(state.grid);
+          tile.isMine = false;
+        }
       }
+
       tile.revealed = true;
       revealSafeAdjacentTiles(state.grid, tile);
 
@@ -89,7 +105,7 @@ export class GameState extends State<GameModel> {
     });
 
     if (difficultyChanged) {
-      this.startGame();
+      this.generateNewBoard();
     }
   }
 }

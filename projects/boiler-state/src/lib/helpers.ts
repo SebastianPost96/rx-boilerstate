@@ -34,7 +34,7 @@ export function asSelector<T>(observable: Observable<T>, changeDef?: ChangeDefin
 
 export function shareState<T>(changeDef?: ChangeDefinition<T>): MonoTypeOperatorFunction<T> {
   let comparator: undefined | ((previous: T, current: T) => boolean);
-  if (changeDef === 'deep') comparator = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+  if (changeDef === 'deep') comparator = deepCompare;
   else if (changeDef === 'shallow') comparator = shallowCompare;
   else comparator = changeDef;
 
@@ -80,4 +80,8 @@ function shallowCompare(a: any, b: any): boolean {
     }
   }
   return true;
+}
+
+function deepCompare(a: any, b: any): boolean {
+  return a === b || JSON.stringify(a) === JSON.stringify(b);
 }

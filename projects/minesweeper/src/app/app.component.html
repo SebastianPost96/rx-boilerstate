@@ -9,5 +9,5 @@
     </button>
   </div>
 
-  <app-board *ngIf="(state.process$ | async)! > 0"></app-board>
+  <app-board *ngIf="(state.grid$ | async)?.length"></app-board>
 </div>

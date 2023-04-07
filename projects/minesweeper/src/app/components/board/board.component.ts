@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { GameState } from '../../state/game-state';
 import { GameProcess } from '../../models/game-process';
+import { GameState } from '../../state/game-state';
 
 @Component({
   selector: 'app-board',

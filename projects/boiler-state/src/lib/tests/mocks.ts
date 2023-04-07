@@ -27,10 +27,11 @@ export class TestState extends State<TestInterface> {
     items.map((item) => ({ ...item, title: str }))
   );
 
-  getItemById = this.selectDynamic((state, id: number) => state.items.find((item) => item.id === id));
-  getItemsByTitle = this.deriveDynamic(this.items$, ([items], title: string) =>
-    items.filter((item) => item.title === title)
-  );
+  getItemById = (id: number) => this.select((state) => state.items.find((item) => item.id === id));
+  getItemsByTitle = (title: string) =>
+    this.derive(this.items$, (items) => items.filter((item) => item.title === title));
+  getItemsByTitleShallow = (title: string) =>
+    this.derive(this.items$, (items) => items.filter((item) => item.title === title)).defineChange('shallow');
 
   addItem(item: TestItem): void {
     this.updateState((state) => {

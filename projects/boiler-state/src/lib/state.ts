@@ -1,7 +1,7 @@
 import produce from 'immer';
-import { BehaviorSubject, Observable, combineLatest, distinctUntilChanged } from 'rxjs';
+import { BehaviorSubject, combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { asSelector, deactivateLogging, logActions, shareState } from './helpers';
+import { asSelector, logActions } from './helpers';
 import { Selector, SelectorTuple, StateConfig } from './types';
 
 export abstract class State<S extends Record<string, any>> {
@@ -38,38 +38,15 @@ export abstract class State<S extends Record<string, any>> {
   }
 
   protected select<T>(selectorFn: (state: S) => T): Selector<T> {
-    const selection = this._store.pipe(map(selectorFn), shareState());
+    const selection = this._store.pipe(map(selectorFn));
     return asSelector(selection);
   }
 
-  protected selectDynamic<T, Args extends unknown[]>(
-    selectorFn: (state: S, ...fnArgs: Args) => T
-  ): (...fnArgs: Args) => Selector<T> {
-    const fn = (...args: Args) => this.select((state) => selectorFn(state, ...args));
-    deactivateLogging(fn);
-    return fn;
-  }
-
-  public derive<T, Args extends unknown[]>(...args: [...SelectorTuple<Args>, (...args: Args) => T]): Selector<T> {
+  protected derive<T, Args extends unknown[]>(...args: [...SelectorTuple<Args>, (...args: Args) => T]): Selector<T> {
     const selectorFn = args.at(-1) as (...args: Args) => T;
     const selectors = args.slice(0, args.length - 1) as SelectorTuple<Args>;
 
-    const observable = combineLatest(selectors).pipe(
-      map((args) => selectorFn(...(args as Args))),
-      shareState()
-    );
+    const observable = combineLatest(selectors).pipe(map((args) => selectorFn(...(args as Args))));
     return asSelector(observable);
-  }
-
-  public deriveDynamic<T, SelectorArgs extends unknown[], FnArgs extends unknown[]>(
-    ...args: [...SelectorTuple<SelectorArgs>, (selectorArgs: SelectorArgs, ...fnArgs: FnArgs) => T]
-  ): (...fnArgs: FnArgs) => Selector<T> {
-    const selectorFn = args.at(-1) as (selectorArgs: SelectorArgs, ...fnArgs: FnArgs) => T;
-    const selectors = args.slice(0, args.length - 1) as SelectorTuple<SelectorArgs>;
-
-    const fn = (...fnArgs: FnArgs) =>
-      this.derive(...selectors, (...sArgs: SelectorArgs) => selectorFn(sArgs, ...fnArgs));
-    deactivateLogging(fn);
-    return fn;
   }
 }

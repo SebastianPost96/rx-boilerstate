@@ -49,4 +49,30 @@ describe('Sharing Behaviour', () => {
 
     expect(state.itemCalculations).toBe(3);
   });
+
+  it('should emit on new ref with regular change definition', () => {
+    let calcCount = 0;
+    const title = 'hello world';
+
+    const selector = state.getItemsByTitle(title);
+    selector.subscribe(() => calcCount++);
+    state.addItem({ id: 1, title });
+    state.addItem({ id: 2 });
+    state.addItem({ id: 3 });
+
+    expect(calcCount).toBe(4);
+  });
+
+  it('should not emit with custom change definition', () => {
+    let calcCount = 0;
+    const title = 'hello world';
+
+    const selector = state.getItemsByTitleShallow(title);
+    selector.subscribe(() => calcCount++);
+    state.addItem({ id: 1, title });
+    state.addItem({ id: 2 });
+    state.addItem({ id: 3 });
+
+    expect(calcCount).toBe(2);
+  });
 });

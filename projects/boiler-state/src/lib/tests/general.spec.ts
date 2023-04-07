@@ -1,5 +1,6 @@
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { TestState } from './mocks';
+import { asSelector } from '../helpers';
 
 describe('General State Tests', () => {
   let state: TestState;
@@ -17,7 +18,7 @@ describe('General State Tests', () => {
     state.someString$.subscribe();
     state.destroy();
 
-    expect(state['store'].observed).toBeFalsy();
+    expect(state['_store'].observed).toBeFalsy();
   });
 
   it('should get a state snapshot', () => {

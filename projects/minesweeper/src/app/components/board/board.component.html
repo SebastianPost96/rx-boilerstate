@@ -3,7 +3,7 @@
     grid: (gameState.grid$ | async)!,
     process: (gameState.process$ | async)!,
     remainingMines: (gameState.remainingMines$ | async)!,
-    timer: (gameState.timer$ | async) ?? 0
+    timer: (timer$ | async)
   } as state"
   class="board-container"
 >

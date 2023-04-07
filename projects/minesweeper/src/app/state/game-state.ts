@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { State } from 'projects/boiler-state/src/public-api';
+import { filter, find, interval, map, of, startWith, switchMap, takeUntil } from 'rxjs';
 import { GAME_CONFIGS } from '../constants/game-configs';
 import { Difficulty } from '../models/difficulty';
 import { GameProcess } from '../models/game-process';
 import { Point, Tile } from '../models/tile';
 import { getAdjacentTiles, revealSafeAdjacentTiles, setRandomMine } from './helpers';
-import { interval, map } from 'rxjs';
 
 interface GameModel {
   process: GameProcess;
@@ -35,7 +35,19 @@ export class GameState extends State<GameModel> {
     }
     return mines - flags;
   });
-  public timer$ = interval(1000).pipe(map((i) => i + 1));
+
+  public timer$ = this.process$.pipe(
+    filter((process) => process === GameProcess.Playing || process === GameProcess.Start),
+    switchMap((process) =>
+      process === GameProcess.Start
+        ? of(0)
+        : interval(1000).pipe(
+            map((i) => i + 1),
+            startWith(0),
+            takeUntil(this.process$.pipe(find((p) => p !== GameProcess.Playing)))
+          )
+    )
+  );
 
   // example of custom change detection
   private adjacentTiles = (tile: Tile) =>

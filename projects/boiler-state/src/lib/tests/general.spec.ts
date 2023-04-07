@@ -56,4 +56,14 @@ describe('General State Tests', () => {
 
     expect(selector.snapshot.length).toBe(2);
   });
+
+  it('should use the same source when defining a change', () => {
+    const src = state.items$;
+    const test = src
+      .defineChange('deep')
+      .defineChange('shallow')
+      .defineChange((a) => !!a);
+
+    expect(test.source?.source).toBe(src.source?.source);
+  });
 });

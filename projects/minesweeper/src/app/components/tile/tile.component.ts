@@ -66,12 +66,10 @@ export class TileComponent implements OnInit, OnDestroy {
 
   private _revealTile(event: MouseEvent): void {
     if (event.button !== 0) return;
-    if (this.tile.isFlagged || this.tile.revealed) return;
     this.state.revealTile(this.tile.location);
   }
 
   private _flagTile(event: MouseEvent): void {
-    if (this.tile.revealed) return;
     if (event.button !== 2) return;
     this.state.flagTile(this.tile.location);
   }

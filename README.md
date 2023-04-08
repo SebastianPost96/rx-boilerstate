@@ -26,7 +26,7 @@ npm install rx-boilerstate
 
 ## Usage
 
-To use rx-boilerstate in your project, you first need to implement an injectable state by extending the State class and providing initial store values. You can also inject dependencies as with any other Angular service.
+To use rx-boilerstate in your project, you first need to implement an injectable state by extending the State class and providing initial store values. It is possible to inject dependencies as with any Angular service.
 
 ```typescript
 import { Injectable } from "@angular/core";
@@ -49,7 +49,6 @@ export class OfficeState extends State<Office> {
 You can then select slices of the state by using the `select` method and supplying a mapping function from the state to your desired result. This will create an observable Selector that emits a new value whenever the selected slice changes.
 
 ```typescript
-
 public employees$ = this.select(state => state.employees);
 public coffees$ = this.select(state => state.coffees);
 ```
@@ -69,8 +68,8 @@ Existing Selectors can be combined with the `derive` method to create a new Sele
 ```typescript
 // filter black coffees that are liked by any employee
 public likedBlackCoffees$ = this.derive(this.coffees$, this.employees$, (coffees, employees) =>
-  coffees.filter((coffee) => {
-    const isLiked = employees.some((employee) => employee.likes(coffee));
+  coffees.filter(coffee => {
+    const isLiked = employees.some(employee => employee.likes(coffee));
     return !coffee.hasMilk && isLiked;
   })
 );
@@ -170,7 +169,7 @@ public johnDoes$ = this.officeState.employeesByFirstAndLastName('John', 'Doe');
 
 ### Optimizing Change Detection
 
-By default, Selectors will emit a change if their result changes using the cost-efficient `===` operator. So if your mapping function returns an object or array that was created inside the function, for example using `filter`, the Selector will emit an update and trigger the change detection of both Angular and derived Selectors.
+By default, Selectors will emit a change if their result changes, using the cost-efficient `===` operator. If your mapping function returns an object or array that was created inside the function, for example using `filter`, the Selector will emit an update even if the content of the result remains the same. This will trigger change detection of both Angular and derived Selectors.
 
 To circumvent this, you can call a Selector's `defineChange` function. This will return a new Selector instance with its default change detection overwritten by a custom definition.
 

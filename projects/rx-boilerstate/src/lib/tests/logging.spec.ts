@@ -2,52 +2,57 @@ import { TestState } from './mocks';
 
 describe('State Logging', () => {
   let state: TestState;
+  let spy: jest.SpyInstance;
 
   beforeEach(async () => {
     state = new TestState({ debug: true });
   });
 
+  afterEach(async () => {
+    spy.mockRestore();
+  });
+
   it('should log actions', () => {
-    spyOn(console, 'log');
+    spy = jest.spyOn(console, 'log').mockImplementation();
 
     const actionName = 'noop';
     state[actionName]();
 
-    expect(console.log).toHaveBeenCalledWith(`${state.constructor.name}.${actionName}`, []);
+    expect(spy).toHaveBeenCalledWith(`${state.constructor.name}.${actionName}`, []);
   });
 
   it('should not log if actions are only referenced', () => {
-    spyOn(console, 'log');
+    spy = jest.spyOn(console, 'log').mockImplementation();
 
     state.noop;
     state.addItem;
     state.displayItems$;
     state.asSelector().snapshot;
 
-    expect(console.log).not.toHaveBeenCalled();
+    expect(spy).not.toHaveBeenCalled();
   });
 
   it('should log state updates', () => {
-    spyOn(console, 'log');
+    spy = jest.spyOn(console, 'log').mockImplementation();
     state.addItem({ id: 5 });
 
-    expect(console.log).toHaveBeenCalledWith(state.constructor.name, state.asSelector().snapshot);
+    expect(spy).toHaveBeenCalledWith(state.constructor.name, state.asSelector().snapshot);
   });
 
   it('should not log built-in functions', () => {
     const fnName = 'select';
-    spyOn(console, 'log');
+    spy = jest.spyOn(console, 'log').mockImplementation();
 
     state[fnName]((s) => s.items);
 
-    expect(console.log).not.toHaveBeenCalledWith(fnName);
+    expect(spy).not.toHaveBeenCalledWith(fnName);
   });
 
   it('should not log factory functions', () => {
-    spyOn(console, 'log');
+    spy = jest.spyOn(console, 'log').mockImplementation();
 
     state.getItemById(1);
 
-    expect(console.log).not.toHaveBeenCalled();
+    expect(spy).not.toHaveBeenCalled();
   });
 });

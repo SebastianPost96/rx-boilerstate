@@ -142,7 +142,7 @@ Completes the state Observable, unsubscribing all observers and preventing any f
 
 ### Parameterised Selectors
 
-You can create selector factories by writing arrows functions that take your desired arguments and then use these arguments in the mapping functions of either `select` or `derive`
+You can create Selector factories by writing arrows functions that take your desired arguments and then use these arguments in the mapping functions of either `select` or `derive`
 
 ```typescript
 // in state
@@ -154,7 +154,7 @@ public employeesByFirstName = (firstName: string) => {
 public johns$ = this.officeState.employeesByFirstName('John');
 ```
 
-In the same manner, you can also create selector factories from already existing factories.
+In the same manner, you can also create Selector factories from already existing factories.
 
 ```typescript
 // in state

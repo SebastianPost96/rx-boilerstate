@@ -14,7 +14,7 @@ Rx Boilerstate is a minimalistic and performant library for managing state in An
 
 ### Example Project
 
-- [Minesweeper](https://stackblitz.com/github/SebastianPost96/rx-boilerstate) - using ~150 lines of business logic
+- Minesweeper using ~150 lines of business logic | [App](https://sebastianpost96.github.io/rx-boilerstate/) | [Repo](https://github.com/SebastianPost96/rx-boilerstate/tree/main/projects/minesweeper)
 
 ## Installation
 

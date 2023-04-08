@@ -101,29 +101,43 @@ console.log(`There are ${employeeCount} employees in the office.`);
 
 Rx Boilerstate revolves around the State abstract class which provides nearly all functions in the library.
 
+---
+
 `protected select<T>(selectorFn: (state: S) => T): Selector<T>`
 
 Selects a slice of state using by passing a mapping function.
+
+---
 
 `protected derive<T, Args>(...selectors: Selectors<Args>, selectorFn: (...args: Args) => T]): Selector<T>`
 
 Takes an arbitrary amount of Selectors followed by a mapping function to select a derived slice of state.
 
+---
+
 `protected updateState(recipe: (currentState: S) => S | void): void`
 
 Takes a function that receives a draft of the current state as a parameter. Mutations on this draft update the state using [immer](https://immerjs.github.io/immer/produce), allowing for immutable data and efficient change detection.
+
+---
 
 `public asSelector(): Selector<S>`
 
 Returns a Selector of the entire state.
 
+---
+
 `public reset(): void`
 
 Resets the state to the defaults provided in the constructor.
 
+---
+
 `public destroy(): void`
 
 Completes the state Observable, unsubscribing all observers and preventing any further emissions.
+
+---
 
 ### Advanced Concepts
 

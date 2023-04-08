@@ -1,8 +1,8 @@
-## Rx Boilerstate
+# Rx Boilerstate
 
-rx-boilerstate is a minimalistic and performant library for managing state in Angular applications. It provides a boilerplate class that can be extended to easily create an Observable state.
+Rx Boilerstate is a minimalistic and performant library for managing state in Angular applications. It provides a boilerplate class that can be extended to easily create an Observable state.
 
-#### Features
+### Features
 
 - Minimal Implementation Code
 - Snapshotting
@@ -12,11 +12,11 @@ rx-boilerstate is a minimalistic and performant library for managing state in An
 - Integration with Angular's `async` pipe and `OnPush` change detection mode
 - Adherence to [LIFT](https://angular.io/guide/styleguide#lift) guidelines and the CQRS Pattern
 
-#### Example Project
+### Example Project
 
-- Minesweeper - using ~150 lines of business logic
+- [Minesweeper](https://stackblitz.com/github/SebastianPost96/rx-boilerstate) - using ~150 lines of business logic
 
-### Installation
+## Installation
 
 You can install rx-boilerstate via npm:
 
@@ -24,12 +24,13 @@ You can install rx-boilerstate via npm:
 npm install rx-boilerstate
 ```
 
-### Usage
+## Usage
 
-To use rx-boilerstate in your project, you first need to implement an injectable state by extending the State class and providing initial store values:
+To use rx-boilerstate in your project, you first need to implement an injectable state by extending the State class and providing initial store values. You can also inject dependencies as with any other Angular service.
 
 ```typescript
 import { Injectable } from "@angular/core";
+import { HttpClient } from "@angular/common/http";
 import { State } from "rx-boilerstate";
 
 interface Office {
@@ -39,7 +40,7 @@ interface Office {
 
 @Injectable()
 export class OfficeState extends State<Office> {
-  constructor() {
+  constructor(private httpClient: HttpClient) {
     super({ employees: [], coffees: [] });
   }
 }
@@ -67,7 +68,7 @@ Existing Selectors can be combined with the `derive` method to create a new Sele
 
 ```typescript
 // filter black coffees that are liked by any employee
-likedBlackCoffees$ = this.derive(this.coffees$, this.employees$, (coffees, employees) =>
+public likedBlackCoffees$ = this.derive(this.coffees$, this.employees$, (coffees, employees) =>
   coffees.filter((coffee) => {
     const isLiked = employees.some((employee) => employee.likes(coffee));
     return !coffee.hasMilk && isLiked;
@@ -95,7 +96,7 @@ const employeeCount = this.officeState.employees$.snapshot.length;
 console.log(`There are ${employeeCount} employees in the office.`);
 ```
 
-### API Overview
+## API Overview
 
 Rx Boilerstate revolves around the State abstract class which provides nearly all functions in the library. For more in-depth documentation and examples, refer to the JSDoc.
 
@@ -137,28 +138,79 @@ Completes the state Observable, unsubscribing all observers and preventing any f
 
 ---
 
-### Advanced Concepts
+## Advanced Concepts
 
-#### Dynamic Selectors
+### Parameterised Selectors
 
-...
+You can create selector factories by writing arrows functions that take your desired arguments and then use these arguments in the mapping functions of either `select` or `derive`
 
-#### Optimizing Change Detection
+```typescript
+// in state
+public employeesByFirstName = (firstName: string) => {
+  return this.derive(this.employees$, employees => employees.filter(employee => employee.firstName === firstName)),
+}
 
-...
+// in component
+public johns$ = this.officeState.employeesByFirstName('John');
+```
 
-#### Provider Scope
+In the same manner, you can also create selector factories from already existing factories.
 
-...
+```typescript
+// in state
+public employeesByFirstAndLastName = (firstName: string, lastName: string) => {
+  return this.derive(this.employeesByFirstName(firstName), filteredEmployees => {
+    return filteredEmployees.filter(employee => employee.lastName === lastName));
+  }
+}
 
-#### Logging
+// in component
+public johnDoes$ = this.officeState.employeesByFirstAndLastName('John', 'Doe');
+```
 
-...
+### Optimizing Change Detection
 
-### Contributing
+By default, Selectors will emit a change if their result changes using the cost-efficient `===` operator. So if your mapping function returns an object or array that was created inside the function, for example using `filter`, the Selector will emit an update and trigger the change detection of both Angular and derived Selectors.
 
-Contributions are welcome! If you encounter any bugs or have a feature request, please open an issue on GitHub. If you would like to contribute code, please fork the repository and submit a pull request.
+To circumvent this, you can call a Selector's `defineChange` function. This will return a new Selector instance with its default change detection overwritten by a custom definition.
 
-### License
+```typescript
+// optimized Selector
+public blackCoffees$ = this.derive(this.coffees$,
+  coffees => coffees.filter(coffee => !coffee.hasMilk))
+  .defineChange('shallow');
+```
 
-This project is licensed under the [MIT License](LICENSE).
+There are three ways to define a change:
+
+1. `'shallow'` - compares objects using `===` and if false, compares the first depth of values with `===` instead.
+2. `'deep'` compares objects using `===` and if false, compares them by converting them to a JSON string.
+3. A custom comparator as defined by the [distinctUntilChanged](https://rxjs.dev/api/operators/distinctUntilChanged) operator in RxJS.
+
+### Logging
+
+The second parameter of the `super` call inside the state constructor allows you to activate debugging. This will cause all custom method calls and state updates to be logged in the developer console.
+
+```typescript
+export class OfficeState extends State<Office> {
+  constructor() {
+    super({ employees: [], coffees: [] }, { debug: true });
+  }
+}
+```
+
+### Provider Scope
+
+Since all state implementation are injectable, they can be provided on either a global, module or component level.
+
+Specifically for the component level, this means you can create a state where each component has its own associated state instance, making it reusable across different scenarios. In this case, the state instance will also be destroyed along with the component, so it is to call the `destroy` method on your state to ensure that all subscriptions are cleaned up.
+
+For more information on provider scopes, see the [Angular documentation](https://angular.io/guide/providers).
+
+## Contributing
+
+Contributions are welcome! If you encounter any bugs or have a feature request, please [open an issue](https://github.com/SebastianPost96/rx-boilerstate/issues/new) on GitHub. If you would like to contribute code, please [fork the repository](https://github.com/SebastianPost96/rx-boilerstate/fork) and submit a pull request.
+
+## License
+
+This project is licensed under the [MIT Licence](LICENCE).

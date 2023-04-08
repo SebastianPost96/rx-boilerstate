@@ -5,7 +5,7 @@ import { GAME_CONFIGS } from '../constants/game-configs';
 import { Difficulty } from '../models/difficulty';
 import { GameProcess } from '../models/game-process';
 import { Point, Tile } from '../models/tile';
-import { getAdjacentTiles, revealSafeAdjacentTiles, setRandomMine } from './helpers';
+import { getAdjacentTiles, revealSafeAdjacentTiles, setRandomMine } from './game-state.helpers';
 
 interface GameModel {
   process: GameProcess;

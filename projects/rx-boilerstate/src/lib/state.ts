@@ -1,7 +1,7 @@
 import produce from 'immer';
 import { BehaviorSubject, combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { asSelector, logActions } from './helpers';
+import { asSelector, logActions } from './internal-helpers';
 import { Selector, Selectors, StateConfig } from './types';
 
 /**

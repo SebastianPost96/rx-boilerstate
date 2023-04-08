@@ -1,6 +1,6 @@
 import { BehaviorSubject, Observable } from 'rxjs';
 import { TestState } from './mocks';
-import { asSelector } from '../helpers';
+import { asSelector } from '../internal-helpers';
 
 describe('General State Tests', () => {
   let state: TestState;

@@ -7,7 +7,7 @@ rx-boilerstate is a minimalistic and performant library for managing state in An
 - Minimal Implementation Code
 - Snapshotting
 - Automated Logging
-- Immutability provided by [immer](https://immerjs.github.io/immer/)
+- Immutability
 - RxJS Interoperability
 - Integration with Angular's `async` pipe and `OnPush` change detection mode
 - Adherence to [LIFT](https://angular.io/guide/styleguide#lift) guidelines and the CQRS Pattern
@@ -95,11 +95,9 @@ const employeeCount = this.officeState.employees$.snapshot.length;
 console.log(`There are ${employeeCount} employees in the office.`);
 ```
 
-### API Documentation
+### API Overview
 
-#### State
-
-Rx Boilerstate revolves around the State abstract class which provides nearly all functions in the library.
+Rx Boilerstate revolves around the State abstract class which provides nearly all functions in the library. For more in-depth documentation and examples, refer to the JSDoc.
 
 ---
 

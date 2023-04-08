@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { State } from 'rx-boilerstate';
+import { State } from '../../../../rx-boilerstate/src/public-api';
 import { filter, find, interval, map, of, startWith, switchMap, takeUntil } from 'rxjs';
 import { GAME_CONFIGS } from '../constants/game-configs';
 import { Difficulty } from '../models/difficulty';

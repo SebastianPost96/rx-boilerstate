@@ -19,8 +19,10 @@ export interface StateConfig {
   debug?: boolean;
 }
 
-export type SelectorTuple<T> = {
+/** A tuple of selectors. */
+export type Selectors<T> = {
   [K in keyof T]: Selector<T[K]>;
 };
 
+/** A string defining a built-in change function or a custom comparator as defined by {@link https://rxjs.dev/api/operators/distinctUntilChanged distinctUntilChanged}. */
 export type ChangeDefinition<T> = 'shallow' | 'deep' | ((previous: T, current: T) => boolean);

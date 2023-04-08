@@ -2,7 +2,7 @@ import produce from 'immer';
 import { BehaviorSubject, combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { asSelector, logActions } from './helpers';
-import { Selector, SelectorTuple, StateConfig } from './types';
+import { Selector, Selectors, StateConfig } from './types';
 
 /**
  * Base class for states. Create an implementation by extending it.
@@ -52,9 +52,9 @@ export abstract class State<S extends Record<string, any>> {
    * @param recipe A function that takes a draft of the current state as a parameter. Perform mutations on this draft to update the state
    * @example
    * ```ts
-   * this.updateState((state) => {
+   * this.updateState(state => {
    *  state.coffees.push(new Coffee());
-   *  state.employees = state.employees.filter((employee) => employee.name !== 'John Doe');
+   *  state.employees = state.employees.filter(employee => employee.name !== 'John Doe');
    *
    *  // update a nested object
    *  state.employees[5].preferences.theme = 'dark';
@@ -71,7 +71,7 @@ export abstract class State<S extends Record<string, any>> {
    * @example
    * ```ts
    * // select the 'coffees' slice of the state
-   * coffees$ = this.select((state) => state.coffees);
+   * coffees$ = this.select(state => state.coffees);
    * ```
    * @returns A Selector object that represents the selected slice of the state.
    */
@@ -86,8 +86,8 @@ export abstract class State<S extends Record<string, any>> {
    * ```ts
    * // filter black coffees that are liked by any employee
    * likedBlackCoffees$ = this.derive(this.coffees$, this.employees$, (coffees, employees) =>
-   *  coffees.filter((coffee) => {
-   *    const isLiked = employees.some((employee) => employee.likes(coffee));
+   *  coffees.filter(coffee => {
+   *    const isLiked = employees.some(employee => employee.likes(coffee));
    *    return !coffee.hasMilk && isLiked;
    *  })
    * );
@@ -95,10 +95,10 @@ export abstract class State<S extends Record<string, any>> {
    * @returns A Selector of the supplied function's return value.
    */
   protected derive<T, Args extends unknown[]>(
-    ...args: [...SelectorTuple<Args>, (...functionArgs: Args) => T]
+    ...args: [...Selectors<Args>, (...functionArgs: Args) => T]
   ): Selector<T> {
     const selectorFn = args.at(-1) as (...args: Args) => T;
-    const selectors = args.slice(0, args.length - 1) as SelectorTuple<Args>;
+    const selectors = args.slice(0, args.length - 1) as Selectors<Args>;
 
     const observable = combineLatest(selectors).pipe(map((functionArgs) => selectorFn(...(functionArgs as Args))));
     return asSelector(observable);

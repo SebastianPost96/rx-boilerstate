@@ -9,7 +9,19 @@ import {
   OnInit,
 } from '@angular/core';
 import { Selector } from '../../../../../rx-boilerstate/src/public-api';
-import { Observable, distinctUntilChanged, fromEvent, map, merge, startWith, takeUntil } from 'rxjs';
+import {
+  Observable,
+  distinctUntilChanged,
+  filter,
+  fromEvent,
+  map,
+  merge,
+  of,
+  startWith,
+  switchMap,
+  takeUntil,
+  timer,
+} from 'rxjs';
 import { Tile } from '../../models/tile';
 import { GameState } from '../../state/game-state';
 
@@ -46,43 +58,58 @@ export class TileComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.adjacentMines$ = this.state.adjacentMines(this.tile);
 
-    this._zone.runOutsideAngular(() =>
+    // event handlers for touch or desktop
+    if ('ontouchstart' in document.documentElement) {
+      this.mouseOverHandler$ = of(false);
+      const touchEnd$ = fromEvent(this._hostElement.nativeElement, 'touchend');
+      touchEnd$
+        .pipe(
+          filter((evt): evt is TouchEvent => evt instanceof TouchEvent),
+          takeUntil(this._destroy$)
+        )
+        .subscribe((evt) => {
+          evt.preventDefault();
+          this.state.revealTile(this.tile.location);
+        });
+      fromEvent(this._hostElement.nativeElement, 'touchstart')
+        .pipe(
+          switchMap(() => timer(250)),
+          takeUntil(touchEnd$),
+          takeUntil(this._destroy$)
+        )
+        .subscribe(() => {
+          this.state.flagTile(this.tile.location);
+        });
+    } else {
       fromEvent(this._hostElement.nativeElement, 'contextmenu')
-        .pipe(takeUntil(this._destroy$))
-        .subscribe((evt) => this._blockContextMenu(evt as MouseEvent))
-    );
-
-    this._zone.runOutsideAngular(() =>
-      fromEvent(this._hostElement.nativeElement, 'mousedown')
-        .pipe(takeUntil(this._destroy$))
-        .subscribe((evt) => this._flagTile(evt as MouseEvent))
-    );
-
-    this._zone.runOutsideAngular(() =>
+        .pipe(
+          filter((evt): evt is MouseEvent => evt instanceof MouseEvent),
+          takeUntil(this._destroy$)
+        )
+        .subscribe((evt) => evt.preventDefault());
       fromEvent(this._hostElement.nativeElement, 'mouseup')
-        .pipe(takeUntil(this._destroy$))
-        .subscribe((evt) => this._revealTile(evt as MouseEvent))
-    );
+        .pipe(
+          filter((evt): evt is MouseEvent => evt instanceof MouseEvent),
+          takeUntil(this._destroy$)
+        )
+        .subscribe((evt) => {
+          if (evt.button !== 0) return;
+          this.state.revealTile(this.tile.location);
+        });
+      fromEvent(this._hostElement.nativeElement, 'mousedown')
+        .pipe(
+          filter((evt): evt is MouseEvent => evt instanceof MouseEvent),
+          takeUntil(this._destroy$)
+        )
+        .subscribe((evt) => {
+          if (evt.button !== 2) return;
+          this.state.flagTile(this.tile.location);
+        });
+    }
   }
 
   ngOnDestroy(): void {
     this._destroy$.next();
     this._destroy$.complete();
-  }
-
-  private _revealTile(event: MouseEvent): void {
-    if (event.button !== 0) return;
-    if (this.tile.isFlagged || this.tile.revealed) return;
-    this.state.revealTile(this.tile.location);
-  }
-
-  private _flagTile(event: MouseEvent): void {
-    if (this.tile.revealed) return;
-    if (event.button !== 2) return;
-    this.state.flagTile(this.tile.location);
-  }
-
-  private _blockContextMenu(event: MouseEvent): void {
-    event.preventDefault();
   }
 }

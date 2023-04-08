@@ -79,6 +79,7 @@ export class GameState extends State<GameModel> {
   public revealTile(location: Point): void {
     this.updateState((state) => {
       const tile = state.grid[location.y][location.x];
+      if (tile.isFlagged || tile.revealed) return;
 
       // start game on first click
       if (state.process === GameProcess.Start) {
@@ -105,6 +106,7 @@ export class GameState extends State<GameModel> {
   public flagTile(location: Point): void {
     this.updateState((state) => {
       const tile = state.grid[location.y][location.x];
+      if (tile.revealed) return;
       tile.isFlagged = !tile.isFlagged;
     });
   }

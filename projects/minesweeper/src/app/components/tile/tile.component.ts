@@ -56,11 +56,13 @@ export class TileComponent implements OnInit, OnDestroy {
     const touchmove$ = fromSharedEvent(this._hostElement.nativeElement, 'touchmove', {
       passive: true,
     });
-    const onflag$ = touchstart$.pipe(switchMap(() => timer(250).pipe(takeUntil(merge(touchmove$, touchend$)))));
+    const onflag$ = touchstart$.pipe(
+      switchMap(() => timer(250).pipe(takeUntil(merge(touchmove$, touchend$)))),
+      share()
+    );
 
     onflag$.pipe(takeUntil(this._destroy$)).subscribe(() => {
       navigator.vibrate(50);
-
       this.state.flagTile(this.tile.location);
     });
     touchstart$

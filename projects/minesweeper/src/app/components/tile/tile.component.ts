@@ -57,7 +57,7 @@ export class TileComponent implements OnInit, OnDestroy {
       passive: true,
     });
     const onflag$ = touchstart$.pipe(
-      switchMap(() => timer(250).pipe(takeUntil(merge(touchmove$, touchend$)))),
+      switchMap(() => timer(350).pipe(takeUntil(merge(touchmove$, touchend$)))),
       share()
     );
 

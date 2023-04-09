@@ -49,10 +49,12 @@ export class GameState extends State<GameModel> {
           )
     )
   );
+
   // example of custom change detection
   private adjacentTiles = (tile: Tile) =>
     this.derive(this.grid$, (grid) => getAdjacentTiles(grid, tile)).defineChange('shallow');
-  // example of deriving dynamic state
+
+  // example of deriving a parameterized selector
   public adjacentMines = (tile: Tile) =>
     this.derive(this.adjacentTiles(tile), (tiles) => tiles.filter((t) => t.isMine).length);
 
@@ -60,6 +62,7 @@ export class GameState extends State<GameModel> {
     this.updateState((state) => {
       const { dimensions, mines } = GAME_CONFIGS[state.difficulty];
 
+      // generate empty grid based on difficulty
       state.grid = [];
       for (let y = 0; y < dimensions.y; y++) {
         state.grid[y] = [];
@@ -76,9 +79,9 @@ export class GameState extends State<GameModel> {
     });
   }
 
-  public revealTile(location: Point): void {
+  public revealTile({ y, x }: Point): void {
     this.updateState((state) => {
-      const tile = state.grid[location.y][location.x];
+      const tile = state.grid[y][x];
       if (tile.isFlagged || tile.revealed) return;
 
       // start game on first click
@@ -103,9 +106,9 @@ export class GameState extends State<GameModel> {
     });
   }
 
-  public flagTile(location: Point): void {
+  public flagTile({ y, x }: Point): void {
     this.updateState((state) => {
-      const tile = state.grid[location.y][location.x];
+      const tile = state.grid[y][x];
       if (tile.revealed) return;
       tile.isFlagged = !tile.isFlagged;
     });

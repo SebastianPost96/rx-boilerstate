@@ -56,6 +56,13 @@ describe('Compare Functions', () => {
     expect(shallowCompare(obj1, obj2)).toBeFalsy();
   });
 
+  it('shallow comparison should use fallback comparison for other objects', () => {
+    const obj1 = null;
+    const obj2 = NaN;
+
+    expect(shallowCompare(obj1, obj2)).toBeFalsy();
+  });
+
   it('deep comparison should allow equal reference', () => {
     const obj1 = { test: 123 };
     const obj2 = { ...obj1 };

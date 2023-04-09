@@ -1,6 +1,6 @@
-# Rx Boilerstate
+# rx-boilerstate
 
-Rx Boilerstate is a minimalistic and performant library for managing state in Angular applications. It provides a boilerplate class that can be extended to easily create an Observable state.
+rx-boilerstate is a minimalistic and performant library designed for state management in Angular applications. It provides a boilerplate state class that can be extended to easily create an Observable state.
 
 ### Features
 
@@ -78,13 +78,8 @@ public likedBlackCoffees$ = this.derive(this.coffees$, this.employees$, (coffees
 Because the state is injectable, Selectors can be used directly in component templates by using the `async` pipe.
 
 ```HTML
-<div
-  *ngIf="{
-    coffees: officeState.coffees$ | async,
-    employees: officeState.employees$ | async
-  } as vm"
->
-    There are {{ vm.employees.length }} employees in the office.
+<div *ngIf="officeState.employees$ | async as employees">
+    There are {{ employees.length }} employees in the office.
 </div>
 ```
 
@@ -97,7 +92,7 @@ console.log(`There are ${employeeCount} employees in the office.`);
 
 ## API Overview
 
-Rx Boilerstate revolves around the State abstract class which provides nearly all functions in the library. For more in-depth documentation and examples, refer to the JSDoc.
+The library revolves around the State abstract class which provides nearly all functions in the library. For more in-depth documentation and examples, refer to the JSDoc.
 
 ---
 
@@ -157,14 +152,14 @@ In the same manner, you can also create Selector factories from already existing
 
 ```typescript
 // in state
-public employeesByFirstAndLastName = (firstName: string, lastName: string) => {
+public employeesByFullName = (firstName: string, lastName: string) => {
   return this.derive(this.employeesByFirstName(firstName), filteredEmployees => {
     return filteredEmployees.filter(employee => employee.lastName === lastName));
   }
 }
 
 // in component
-public johnDoes$ = this.officeState.employeesByFirstAndLastName('John', 'Doe');
+public johnDoes$ = this.officeState.employeesByFullName('John', 'Doe');
 ```
 
 ### Optimizing Change Detection
@@ -205,6 +200,10 @@ Since all state implementation are injectable, they can be provided on either a 
 Specifically for the component level, this means you can create a state where each component has its own associated state instance, making it reusable across different scenarios. In this case, the state instance will also be destroyed along with the component, so it is to call the `destroy` method on your state to ensure that all subscriptions are cleaned up.
 
 For more information on provider scopes, see the [Angular documentation](https://angular.io/guide/providers).
+
+## Compatibility
+
+The only peer-dependencies are `immer` and `rxjs`. Although the library was designed for Angular, it not a direct dependency and can therefore also be used with other Frameworks such as React and Vue.
 
 ## Contributing
 

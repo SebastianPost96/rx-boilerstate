@@ -41,5 +41,7 @@ export class TestState extends State<TestInterface> {
       state.someString = str;
     });
   }
-  noop(): void {}
+  noop(): void {
+    return;
+  }
 }

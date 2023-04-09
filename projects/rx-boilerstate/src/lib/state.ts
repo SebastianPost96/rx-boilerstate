@@ -17,6 +17,7 @@ import { Selector, Selectors, StateConfig } from './types';
  * export class OfficeState extends State<Office> { }
  * ```
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export abstract class State<S extends Record<string, any>> {
   private readonly _store: BehaviorSubject<S>;
   private readonly _defaults: S;

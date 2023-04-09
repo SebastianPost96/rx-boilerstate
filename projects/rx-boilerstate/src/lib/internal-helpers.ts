@@ -55,11 +55,12 @@ export function shareState<T>(changeDef?: ChangeDefinition<T>): MonoTypeOperator
 /** Creates a proxy of a State instance that intercepts function calls and logs them in the console.
  * @returns the created proxy.
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function logActions<S extends State<any>>(state: S): S {
   deactivateLogging(state['select'], state['updateState'], state['destroy'], state['derive'], state['asSelector']);
 
   return new Proxy(state, {
-    get(target: any, propertyKey: keyof typeof target): unknown {
+    get(target: S, propertyKey: keyof S & string): unknown {
       const property: unknown = target[propertyKey];
       if (
         typeof property === 'function' &&
@@ -79,25 +80,35 @@ export function logActions<S extends State<any>>(state: S): S {
 }
 
 /** compares objects using `===` and if false, compares the first depth of values with `===` instead. */
-export function shallowCompare(a: any, b: any): boolean {
+export function shallowCompare(a: unknown, b: unknown): boolean {
+  // performant quickcheck
   if (a === b) return true;
-  if (Array.isArray(a)) return a.length === b.length && a.every((val, i) => b[i] === val);
+
+  // case array
+  if (Array.isArray(a) && Array.isArray(b)) {
+    return a.length === b.length && a.every((val, i) => b[i] === val);
+  }
 
   // case object
-  for (let key in a) {
-    if (!(key in b) || a[key] !== b[key]) {
-      return false;
+  if (a && b && typeof a === 'object' && typeof b === 'object') {
+    for (const key in a) {
+      if (!(key in b) || a[key as never] !== b[key as never]) {
+        return false;
+      }
     }
-  }
-  for (let key in b) {
-    if (!(key in a)) {
-      return false;
+    for (const key in b) {
+      if (!(key in a)) {
+        return false;
+      }
     }
+    return true;
   }
-  return true;
+
+  // fallback comparison
+  return a === b;
 }
 
 /** compares objects using `===` and if false, compares them by converting them to a JSON string. */
-export function deepCompare(a: any, b: any): boolean {
+export function deepCompare(a: unknown, b: unknown): boolean {
   return a === b || JSON.stringify(a) === JSON.stringify(b);
 }

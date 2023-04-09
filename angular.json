@@ -23,6 +23,12 @@
             }
           },
           "defaultConfiguration": "production"
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": ["projects/rx-boilerstate/**/*.ts", "projects/rx-boilerstate/**/*.html"]
+          }
         }
       }
     },
@@ -98,6 +104,12 @@
         },
         "deploy": {
           "builder": "angular-cli-ghpages:deploy"
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": ["projects/minesweeper/**/*.ts", "projects/minesweeper/**/*.html"]
+          }
         }
       }
     }

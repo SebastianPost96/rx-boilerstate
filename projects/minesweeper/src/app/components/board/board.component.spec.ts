@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { BoardComponent } from './board.component';
+import { NgOptimizedImage } from '@angular/common';
 
 describe('BoardComponent', () => {
   let component: BoardComponent;
@@ -8,9 +9,9 @@ describe('BoardComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ BoardComponent ]
-    })
-    .compileComponents();
+      declarations: [BoardComponent],
+      imports: [NgOptimizedImage],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(BoardComponent);
     component = fixture.componentInstance;

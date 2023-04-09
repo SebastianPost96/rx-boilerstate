@@ -21,13 +21,11 @@ export class TestState extends State<TestInterface> {
     this.itemCalculations++;
     return state.items;
   });
-  displayItems$ = this.select((state) => state.displayItems);
   someString$ = this.select((state) => state.someString);
   combination$ = this.derive(this.items$, this.someString$, (items, str) =>
     items.map((item) => ({ ...item, title: str }))
   );
 
-  getItemById = (id: number) => this.select((state) => state.items.find((item) => item.id === id));
   getItemsByTitle = (title: string) =>
     this.derive(this.items$, (items) => items.filter((item) => item.title === title));
   getItemsByTitleShallow = (title: string) =>

@@ -79,7 +79,7 @@ export function logActions<S extends State<any>>(state: S): S {
 }
 
 /** compares objects using `===` and if false, compares the first depth of values with `===` instead. */
-function shallowCompare(a: any, b: any): boolean {
+export function shallowCompare(a: any, b: any): boolean {
   if (a === b) return true;
   if (Array.isArray(a)) return a.length === b.length && a.every((val, i) => b[i] === val);
 
@@ -98,6 +98,6 @@ function shallowCompare(a: any, b: any): boolean {
 }
 
 /** compares objects using `===` and if false, compares them by converting them to a JSON string. */
-function deepCompare(a: any, b: any): boolean {
+export function deepCompare(a: any, b: any): boolean {
   return a === b || JSON.stringify(a) === JSON.stringify(b);
 }

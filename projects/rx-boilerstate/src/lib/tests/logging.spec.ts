@@ -26,7 +26,6 @@ describe('State Logging', () => {
 
     state.noop;
     state.addItem;
-    state.displayItems$;
     state.asSelector().snapshot;
 
     expect(spy).not.toHaveBeenCalled();
@@ -51,7 +50,7 @@ describe('State Logging', () => {
   it('should not log factory functions', () => {
     spy = jest.spyOn(console, 'log').mockImplementation();
 
-    state.getItemById(1);
+    state.getItemsByTitle('title');
 
     expect(spy).not.toHaveBeenCalled();
   });

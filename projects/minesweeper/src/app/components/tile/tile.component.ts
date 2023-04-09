@@ -62,7 +62,7 @@ export class TileComponent implements OnInit, OnDestroy {
     );
 
     onflag$.pipe(takeUntil(this._destroy$)).subscribe(() => {
-      if (!this.tile.isFlagged) navigator.vibrate(50);
+      navigator.vibrate(50);
       this.state.flagTile(this.tile.location);
     });
     touchstart$

@@ -19,8 +19,13 @@ const images = {
   8: 'assets/tile/8.svg',
 };
 
-// preload images
-Object.values(images).forEach((url) => (new Image().src = url));
+// preload images and keep them cached for smoother experience
+const preloadedImages = [];
+Object.values(images).forEach((url) => {
+  const img = new Image();
+  img.src = url;
+  preloadedImages.push(img);
+});
 
 @Pipe({
   name: 'tileImage',

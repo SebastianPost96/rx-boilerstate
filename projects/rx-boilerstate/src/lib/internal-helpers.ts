@@ -1,6 +1,7 @@
 import { MonoTypeOperatorFunction, Observable, distinctUntilChanged, shareReplay } from 'rxjs';
 import { State } from './state';
 import { ChangeDefinition, Selector } from './types';
+import { deepEqual, shallowEqual } from 'fast-equals';
 
 const loggingInactive = Symbol('state logging deactivated');
 
@@ -45,8 +46,8 @@ export function asSelector<T>(observable: Observable<T>, changeDef?: ChangeDefin
  */
 export function shareState<T>(changeDef?: ChangeDefinition<T>): MonoTypeOperatorFunction<T> {
   let comparator: undefined | ((previous: T, current: T) => boolean);
-  if (changeDef === 'deep') comparator = deepCompare;
-  else if (changeDef === 'shallow') comparator = shallowCompare;
+  if (changeDef === 'deep') comparator = deepEqual;
+  else if (changeDef === 'shallow') comparator = shallowEqual;
   else comparator = changeDef;
 
   return (o: Observable<T>) => o.pipe(distinctUntilChanged(comparator), shareReplay({ bufferSize: 0, refCount: true }));

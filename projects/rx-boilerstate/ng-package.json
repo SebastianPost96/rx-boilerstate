@@ -3,5 +3,6 @@
   "dest": "../../dist/rx-boilerstate",
   "lib": {
     "entryFile": "src/public-api.ts"
-  }
+  },
+  "allowedNonPeerDependencies": ["fast-equals", "immer"]
 }

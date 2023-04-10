@@ -6,8 +6,8 @@ export type Selector<T> = Observable<T> & {
   readonly snapshot: T;
   /** Returns a new Selector that uses a custom change comparator.
    * @param changeDefinition
-   * * `shallow` - compares objects using `===` and if false, compares the first depth of values with `===` instead.
-   * * `deep` - compares objects using `===` and if false, compares them by converting them to a JSON string.
+   * * `shallow` - compares values using {@link https://www.npmjs.com/package/fast-equals fast-equals} `shallowEqual`.
+   * * `deep` - compares values using {@link https://www.npmjs.com/package/fast-equals fast-equals} `deepEqual`.
    * * A custom comparator as defined by the {@link https://rxjs.dev/api/operators/distinctUntilChanged distinctUntilChanged} RxJS operator.
    */
   defineChange(changeDefinition: ChangeDefinition<T>): Selector<T>;

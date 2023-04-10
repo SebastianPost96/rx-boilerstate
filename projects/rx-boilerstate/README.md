@@ -164,7 +164,7 @@ public johnDoes$ = this.officeState.employeesByFullName('John', 'Doe');
 
 ### Optimizing Change Detection
 
-By default, Selectors will emit a change if their result changes, using the cost-efficient `===` operator. If your mapping function returns an object or array that was created inside the function, for example using `filter`, the Selector will emit an update even if the content of the result remains the same. This will trigger change detection of both Angular and derived Selectors.
+By default, Selectors will emit a change if their result changes, using the cost-efficient `===` operator. However if your mapping function returns an object or array that was created inside of the function, for example using `filter`, the Selector will emit an update even if the content of the result remains the same, triggering change detection of both Angular and derived Selectors.
 
 To circumvent this, you can call a Selector's `defineChange` function. This will return a new Selector instance with its default change detection overwritten by a custom definition.
 
@@ -177,8 +177,8 @@ public blackCoffees$ = this.derive(this.coffees$,
 
 There are three ways to define a change:
 
-1. `'shallow'` - compares objects using `===` and if false, compares the first depth of values with `===` instead.
-2. `'deep'` compares objects using `===` and if false, compares them by converting them to a JSON string.
+1. `'shallow'` - compares values using [fast-equals](https://www.npmjs.com/package/fast-equals) `shallowEqual`.
+2. `'deep'` compares values using [fast-equals](https://www.npmjs.com/package/fast-equals) `deepEqual`.
 3. A custom comparator as defined by the [distinctUntilChanged](https://rxjs.dev/api/operators/distinctUntilChanged) operator in RxJS.
 
 ### Logging
@@ -203,7 +203,7 @@ For more information on provider scopes, see the [Angular documentation](https:/
 
 ## Compatibility
 
-The only peer-dependencies are `immer` and `rxjs`. Although the library was designed for Angular, it not a direct dependency and can therefore also be used with other Frameworks such as React and Vue.
+The only peer-dependency is `rxjs`. Although the library was designed for Angular, it not a direct dependency and can therefore also be used with other Frameworks such as React and Vue.
 
 ## Contributing
 

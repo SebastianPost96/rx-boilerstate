@@ -79,37 +79,3 @@ export function logActions<S extends State<any>>(state: S): S {
     },
   });
 }
-
-/** compares objects using `===` and if false, compares the first depth of values with `===` instead. */
-export function shallowCompare(a: unknown, b: unknown): boolean {
-  // performant quickcheck
-  if (a === b) return true;
-
-  // case array
-  if (Array.isArray(a) && Array.isArray(b)) {
-    return a.length === b.length && a.every((val, i) => b[i] === val);
-  }
-
-  // case object
-  if (a && b && typeof a === 'object' && typeof b === 'object') {
-    for (const key in a) {
-      if (!(key in b) || a[key as never] !== b[key as never]) {
-        return false;
-      }
-    }
-    for (const key in b) {
-      if (!(key in a)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  // fallback comparison
-  return a === b;
-}
-
-/** compares objects using `===` and if false, compares them by converting them to a JSON string. */
-export function deepCompare(a: unknown, b: unknown): boolean {
-  return a === b || JSON.stringify(a) === JSON.stringify(b);
-}

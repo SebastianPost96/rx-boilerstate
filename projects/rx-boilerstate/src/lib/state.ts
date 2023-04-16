@@ -34,7 +34,7 @@ export abstract class State<S extends Record<string, any>> {
     }
   }
 
-  /** Returns a Selector of the entire state. */
+  /** Returns a Selector of the raw state. */
   public asSelector(): Selector<S> {
     return asSelector(this._store);
   }

@@ -46,18 +46,19 @@ export class OfficeState extends State<Office> {
 }
 ```
 
-You can then select slices of the state by using the `select` method and supplying a mapping function from the state to your desired result. This will create an observable Selector that emits a new value whenever the selected slice changes.
+You can then select slices of the state by using the `select` method and supplying a mapping function from the state to your desired result. This will create an observable Selector that emits a new value if the selected slice was changed.
 
 ```typescript
 public employees$ = this.select(state => state.employees);
 public coffees$ = this.select(state => state.coffees);
 ```
 
-You can update the state by defining a custom method and invoking the `updateState` function, where you can perform changes to the state.
+You can update the state by defining a custom method and invoking the `updateState` function, where you can perform changes to the state. Due to the use of [immer](https://immerjs.github.io/immer/produce), changes to nested objects update their parent and emit changes in related selectors.
 
 ```typescript
 public addCoffee(coffee: Coffee): void {
     this.updateState(state => {
+        // causes coffees$ to emit an update
         state.coffees.push(coffee);
     });
 }
@@ -116,7 +117,7 @@ Takes a function that receives a draft of the current state as a parameter. Muta
 
 `public asSelector(): Selector<S>`
 
-Returns a Selector of the entire state.
+Returns a Selector of the raw state.
 
 ---
 
@@ -139,37 +140,36 @@ Completes the state Observable, unsubscribing all observers and preventing any f
 You can create Selector factories by writing arrows functions that take your desired arguments and then use these arguments in the mapping functions of either `select` or `derive`
 
 ```typescript
-// in state
+// in state class
 public employeesByFirstName = (firstName: string) => {
   return this.derive(this.employees$, employees => employees.filter(employee => employee.firstName === firstName)),
 }
 
-// in component
+// creation of selector
 public johns$ = this.officeState.employeesByFirstName('John');
 ```
 
 In the same manner, you can also create Selector factories from already existing factories.
 
 ```typescript
-// in state
+// in state class
 public employeesByFullName = (firstName: string, lastName: string) => {
   return this.derive(this.employeesByFirstName(firstName), filteredEmployees => {
     return filteredEmployees.filter(employee => employee.lastName === lastName));
   }
 }
 
-// in component
+// creation of selector
 public johnDoes$ = this.officeState.employeesByFullName('John', 'Doe');
 ```
 
 ### Optimizing Change Detection
 
-By default, Selectors will emit a change if their result changes, using the cost-efficient `===` operator. However if your mapping function returns an object or array that was created inside of the function, for example using `filter`, the Selector will emit an update even if the content of the result remains the same, triggering change detection of both Angular and derived Selectors.
+By default, Selectors will emit a change if their result changes by using the cost-efficient `===` operator. However if your mapping function always returns an entirely new object (e.g. because you are using `Array.filter`), the Selector will always emit an update because the object reference has changed. This causes unnecessary calculations down the line by triggering derived Selectors and Angular's change detection.
 
-To circumvent this, you can call a Selector's `defineChange` function. This will return a new Selector instance with its default change detection overwritten by a custom definition.
+To circumvent this, you can make use of a Selector's `defineChange` function. This will return a new Selector instance with it's default comparison overwritten by a custom definition. In the case of `filter`, you would want to see if the _content_ of the resulting array has changed by comparing the first layer of values.
 
 ```typescript
-// optimized Selector
 public blackCoffees$ = this.derive(this.coffees$,
   coffees => coffees.filter(coffee => !coffee.hasMilk))
   .defineChange('shallow');
@@ -177,9 +177,11 @@ public blackCoffees$ = this.derive(this.coffees$,
 
 There are three ways to define a change:
 
-1. `'shallow'` - compares values using [fast-equals](https://www.npmjs.com/package/fast-equals) `shallowEqual`.
-2. `'deep'` compares values using [fast-equals](https://www.npmjs.com/package/fast-equals) `deepEqual`.
+1. `'shallow'` - compares arrays/objects for equality and if false, compares them based on their first depth of values.
+2. `'deep'` compares arrays/objects for equality and if false, compares them based their full depth of values.
 3. A custom comparator as defined by the [distinctUntilChanged](https://rxjs.dev/api/operators/distinctUntilChanged) operator in RxJS.
+
+Shallow and deep comparisons are performed using the library [fast-equals](https://www.npmjs.com/package/fast-equals).
 
 ### Logging
 
@@ -197,7 +199,7 @@ export class OfficeState extends State<Office> {
 
 Since all state implementation are injectable, they can be provided on either a global, module or component level.
 
-Specifically for the component level, this means you can create a state where each component has its own associated state instance, making it reusable across different scenarios. In this case, the state instance will also be destroyed along with the component, so it is to call the `destroy` method on your state to ensure that all subscriptions are cleaned up.
+Specifically for the component level, this means you can create a state where each component has it's own associated state instance, making it reusable across different scenarios. In this case, the state instance will also be destroyed along with the component, so it is to call the `destroy` method on your state to ensure that all subscriptions are cleaned up.
 
 For more information on provider scopes, see the [Angular documentation](https://angular.io/guide/providers).
 

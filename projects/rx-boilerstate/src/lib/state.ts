@@ -1,8 +1,8 @@
-import produce from 'immer';
 import { BehaviorSubject, combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { asSelector, logActions } from './internal-helpers';
 import { Selector, Selectors, StateConfig } from './types';
+import { produce } from 'immer';
 
 /**
  * Base class for states. Create an implementation by extending it.

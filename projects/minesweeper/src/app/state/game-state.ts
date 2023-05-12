@@ -8,7 +8,7 @@ import { getAdjacentTiles, revealSafeAdjacentTiles, setRandomMine } from './game
 import { toObservable } from '@angular/core/rxjs-interop';
 import { shallowEqual } from 'fast-equals';
 import { produce } from 'immer';
-import { SimpleSignal } from 'ngx-simple-signal';
+import { SimpleSignal, fromSimple } from 'ngx-simple-signal';
 
 @Injectable({ providedIn: 'root' })
 export class GameState {
@@ -30,7 +30,7 @@ export class GameState {
   });
 
   // example of rxjs interop
-  private process$ = toObservable(computed(() => this.process));
+  private process$ = toObservable(fromSimple(() => this.process));
   public timer$ = this.process$.pipe(
     filter((process) => process === GameProcess.Playing || process === GameProcess.Start),
     switchMap((process) =>

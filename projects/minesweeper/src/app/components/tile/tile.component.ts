@@ -7,8 +7,8 @@ import {
   OnDestroy,
   OnInit,
   Signal,
+  computed,
 } from '@angular/core';
-import { Selector } from 'rx-boilerstate';
 import {
   Observable,
   delayWhen,
@@ -25,6 +25,7 @@ import {
 } from 'rxjs';
 import { Tile } from '../../models/tile';
 import { GameState } from '../../state/game-state';
+import { SimpleSignal } from 'ngx-simple-signal';
 
 @Component({
   selector: 'app-tile[tile]',
@@ -33,18 +34,16 @@ import { GameState } from '../../state/game-state';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TileComponent implements OnInit, OnDestroy {
-  @Input() tile!: Tile;
+  @Input() @SimpleSignal(undefined) tile!: Tile;
 
   private _destroy$ = new EventEmitter<void>();
 
-  public adjacentMines!: Signal<number>;
+  public adjacentMines = computed(() => this.gameState.adjacentMines(this.tile)());
   public isHeldOver$?: Observable<boolean>;
 
   constructor(public gameState: GameState, private _hostElement: ElementRef) {}
 
   ngOnInit(): void {
-    this.adjacentMines = this.gameState.adjacentMines(this.tile);
-
     const contextmenu$: Observable<MouseEvent> = fromEvent(this._hostElement.nativeElement, 'contextmenu');
     contextmenu$.pipe(takeUntil(this._destroy$)).subscribe((evt) => evt.preventDefault());
 

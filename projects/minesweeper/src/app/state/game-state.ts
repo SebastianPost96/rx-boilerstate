@@ -1,4 +1,4 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, computed } from '@angular/core';
 import { filter, find, interval, map, of, startWith, switchMap, takeUntil } from 'rxjs';
 import { GAME_CONFIGS } from '../constants/game-configs';
 import { Difficulty } from '../models/difficulty';
@@ -8,21 +8,21 @@ import { getAdjacentTiles, revealSafeAdjacentTiles, setRandomMine } from './game
 import { toObservable } from '@angular/core/rxjs-interop';
 import { shallowEqual } from 'fast-equals';
 import { produce } from 'immer';
+import { SimpleSignal } from 'ngx-simple-signal';
 
 @Injectable({ providedIn: 'root' })
 export class GameState {
-  process = signal(GameProcess.Start);
-  grid = signal<Tile[][]>([]);
-  difficulty = signal(Difficulty.Beginner);
+  @SimpleSignal(GameProcess.Start) process!: GameProcess;
+  @SimpleSignal([]) grid!: Tile[][];
+  @SimpleSignal(Difficulty.Beginner) difficulty!: Difficulty;
 
   public remainingMines = computed(() => {
-    const process = this.process();
-    if (process === GameProcess.Start) return GAME_CONFIGS[this.difficulty()].mines;
-    if (process === GameProcess.Win) return 0;
+    if (this.process === GameProcess.Start) return GAME_CONFIGS[this.difficulty].mines;
+    if (this.process === GameProcess.Win) return 0;
 
     let mines = 0;
     let flags = 0;
-    for (const tile of this.grid().flat()) {
+    for (const tile of this.grid.flat()) {
       if (tile.isMine) mines++;
       if (tile.isFlagged) flags++;
     }
@@ -30,7 +30,7 @@ export class GameState {
   });
 
   // example of rxjs interop
-  private process$ = toObservable(this.process);
+  private process$ = toObservable(computed(() => this.process));
   public timer$ = this.process$.pipe(
     filter((process) => process === GameProcess.Playing || process === GameProcess.Start),
     switchMap((process) =>
@@ -45,77 +45,71 @@ export class GameState {
   );
 
   // example of custom change detection
-  private adjacentTiles = (tile: Tile) => computed(() => getAdjacentTiles(this.grid(), tile), { equal: shallowEqual });
+  private adjacentTiles = (tile: Tile) => computed(() => getAdjacentTiles(this.grid, tile), { equal: shallowEqual });
 
   // example of deriving a parameterized selector
   public adjacentMines = (tile: Tile) => computed(() => this.adjacentTiles(tile)().filter((t) => t.isMine).length);
 
   public generateNewBoard(): void {
-    const { dimensions, mines } = GAME_CONFIGS[this.difficulty()];
+    const { dimensions, mines } = GAME_CONFIGS[this.difficulty];
 
     // generate empty grid based on difficulty
-    this.grid.update((grid) =>
-      produce(grid, (draft) => {
-        draft.length = 0;
-        for (let y = 0; y < dimensions.y; y++) {
-          draft[y] = [];
-          for (let x = 0; x < dimensions.x; x++) {
-            draft[y][x] = { isMine: false, isFlagged: false, location: { x, y }, revealed: false };
-          }
+    this.grid = produce(this.grid, (grid) => {
+      grid.length = 0;
+      for (let y = 0; y < dimensions.y; y++) {
+        grid[y] = [];
+        for (let x = 0; x < dimensions.x; x++) {
+          grid[y][x] = { isMine: false, isFlagged: false, location: { x, y }, revealed: false };
         }
+      }
 
-        for (let i = 0; i < mines; i++) {
-          setRandomMine(draft);
-        }
-      })
-    );
+      for (let i = 0; i < mines; i++) {
+        setRandomMine(grid);
+      }
+    });
 
-    this.process.set(GameProcess.Start);
+    this.process = GameProcess.Start;
   }
 
   public revealTile({ y, x }: Point): void {
-    this.grid.update((grid) =>
-      produce(grid, (draft) => {
-        const tile = draft[y][x];
-        if (tile.isFlagged || tile.revealed) return;
+    this.grid = produce(this.grid, (grid) => {
+      const tile = grid[y][x];
+      if (tile.isFlagged || tile.revealed) return;
 
-        // start game on first click
-        if (this.process() === GameProcess.Start) {
-          this.process.set(GameProcess.Playing);
-          if (tile.isMine) {
-            setRandomMine(draft);
-            tile.isMine = false;
-          }
-        }
-
-        tile.revealed = true;
-        revealSafeAdjacentTiles(draft, tile);
-
+      // start game on first click
+      if (this.process === GameProcess.Start) {
+        this.process = GameProcess.Playing;
         if (tile.isMine) {
-          this.process.set(GameProcess.GameOver);
-          return;
+          setRandomMine(grid);
+          tile.isMine = false;
         }
+      }
 
-        const gameWon = draft.flat().every((t) => t.isMine || t.revealed);
-        if (gameWon) this.process.set(GameProcess.Win);
-      })
-    );
+      tile.revealed = true;
+      revealSafeAdjacentTiles(grid, tile);
+
+      if (tile.isMine) {
+        this.process = GameProcess.GameOver;
+        return;
+      }
+
+      const gameWon = grid.flat().every((t) => t.isMine || t.revealed);
+      if (gameWon) this.process = GameProcess.Win;
+    });
   }
 
   public flagTile({ y, x }: Point): void {
-    this.grid.update((grid) =>
-      produce(grid, (draft) => {
-        const tile = draft[y][x];
-        if (tile.revealed) return;
-        tile.isFlagged = !tile.isFlagged;
-      })
-    );
+    this.grid = produce(this.grid, (grid) => {
+      const tile = grid[y][x];
+      if (tile.revealed) return;
+      tile.isFlagged = !tile.isFlagged;
+    });
   }
 
   public setDifficulty(difficulty: Difficulty): void {
-    const difficultyChanged = difficulty !== this.difficulty();
+    const difficultyChanged = difficulty !== this.difficulty;
 
-    this.difficulty.set(difficulty);
+    this.difficulty = difficulty;
 
     if (difficultyChanged) {
       this.generateNewBoard();

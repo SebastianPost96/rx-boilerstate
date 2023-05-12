@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  OnInit,
+  Signal,
+} from '@angular/core';
 import { Selector } from 'rx-boilerstate';
 import {
   Observable,
@@ -28,13 +37,13 @@ export class TileComponent implements OnInit, OnDestroy {
 
   private _destroy$ = new EventEmitter<void>();
 
-  public adjacentMines$?: Selector<number>;
+  public adjacentMines!: Signal<number>;
   public isHeldOver$?: Observable<boolean>;
 
-  constructor(public state: GameState, private _hostElement: ElementRef) {}
+  constructor(public gameState: GameState, private _hostElement: ElementRef) {}
 
   ngOnInit(): void {
-    this.adjacentMines$ = this.state.adjacentMines(this.tile);
+    this.adjacentMines = this.gameState.adjacentMines(this.tile);
 
     const contextmenu$: Observable<MouseEvent> = fromEvent(this._hostElement.nativeElement, 'contextmenu');
     contextmenu$.pipe(takeUntil(this._destroy$)).subscribe((evt) => evt.preventDefault());
@@ -63,14 +72,14 @@ export class TileComponent implements OnInit, OnDestroy {
 
     onflag$.pipe(takeUntil(this._destroy$)).subscribe(() => {
       if (!this.tile.revealed) navigator.vibrate(50);
-      this.state.flagTile(this.tile.location);
+      this.gameState.flagTile(this.tile.location);
     });
     touchstart$
       .pipe(
         delayWhen(() => touchend$.pipe(takeUntil(merge(touchmove$, onflag$)))),
         takeUntil(this._destroy$)
       )
-      .subscribe(() => this.state.revealTile(this.tile.location));
+      .subscribe(() => this.gameState.revealTile(this.tile.location));
   }
 
   private _listenToMouseEvents(): void {
@@ -81,11 +90,11 @@ export class TileComponent implements OnInit, OnDestroy {
 
     mousedown$.pipe(takeUntil(this._destroy$)).subscribe((evt) => {
       if (evt.button !== 2) return;
-      this.state.flagTile(this.tile.location);
+      this.gameState.flagTile(this.tile.location);
     });
     mouseup$.pipe(takeUntil(this._destroy$)).subscribe((evt) => {
       if (evt.button !== 0) return;
-      this.state.revealTile(this.tile.location);
+      this.gameState.revealTile(this.tile.location);
     });
 
     this.isHeldOver$ = merge(mouseup$, mousedown$, mouseenter$, mouseleave$).pipe(

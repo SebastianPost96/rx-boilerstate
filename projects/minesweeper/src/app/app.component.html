@@ -3,11 +3,11 @@
     <button
       *ngFor="let difficulty of difficulties"
       (click)="state.setDifficulty(difficulty)"
-      [disabled]="difficulty === (state.difficulty$ | async)"
+      [disabled]="difficulty === state.difficulty()"
     >
       {{ difficulty }}
     </button>
   </div>
 
-  <app-board *ngIf="(state.grid$ | async)?.length"></app-board>
+  <app-board *ngIf="state.grid().length"></app-board>
 </div>

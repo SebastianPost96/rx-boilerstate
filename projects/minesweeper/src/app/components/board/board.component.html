@@ -13,8 +13,8 @@
         [ngSrc]="'assets/angular.png'"
         [height]="30"
         [width]="30"
-        [class.win]="gameState.process === gameProcess.Win"
-        [class.loss]="gameState.process === gameProcess.GameOver"
+        [class.win]="gameState.process() === gameProcess.Win"
+        [class.loss]="gameState.process() === gameProcess.GameOver"
         (click)="gameState.generateNewBoard()"
       />
     </div>
@@ -23,9 +23,9 @@
 
   <div
     class="game-container"
-    [style.pointer-events]="[gameProcess.GameOver, gameProcess.Win].includes(gameState.process) ? 'none' : null"
+    [style.pointer-events]="[gameProcess.GameOver, gameProcess.Win].includes(gameState.process()) ? 'none' : null"
   >
-    <div class="row" *ngFor="let row of gameState.grid; trackBy: byIndex">
+    <div class="row" *ngFor="let row of gameState.grid(); trackBy: byIndex">
       <app-tile *ngFor="let tile of row; trackBy: byIndex" [tile]="tile"></app-tile>
     </div>
   </div>

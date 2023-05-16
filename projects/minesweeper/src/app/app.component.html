@@ -2,12 +2,12 @@
   <div class="buttons">
     <button
       *ngFor="let difficulty of difficulties"
-      (click)="state.setDifficulty(difficulty)"
-      [disabled]="difficulty === state.difficulty"
+      (click)="gameState.setDifficulty(difficulty)"
+      [disabled]="difficulty === gameState.difficulty()"
     >
       {{ difficulty }}
     </button>
   </div>
 
-  <app-board *ngIf="state.grid.length"></app-board>
+  <app-board *ngIf="gameState.grid().length"></app-board>
 </div>

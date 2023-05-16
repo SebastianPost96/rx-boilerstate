@@ -4,6 +4,7 @@ import {
   ElementRef,
   EventEmitter,
   Input,
+  OnChanges,
   OnDestroy,
   OnInit,
   Signal,
@@ -25,7 +26,6 @@ import {
 } from 'rxjs';
 import { Tile } from '../../models/tile';
 import { GameState } from '../../state/game-state';
-import { SimpleSignal } from 'ngx-simple-signal';
 
 @Component({
   selector: 'app-tile[tile]',
@@ -33,21 +33,30 @@ import { SimpleSignal } from 'ngx-simple-signal';
   styleUrls: ['./tile.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TileComponent implements OnInit, OnDestroy {
-  @Input() @SimpleSignal(undefined) tile!: Tile;
+export class TileComponent implements OnInit, OnDestroy, OnChanges {
+  @Input() tile!: Tile;
+  @Input() num!: boolean;
 
   private _destroy$ = new EventEmitter<void>();
 
-  public adjacentMines = computed(() => this.gameState.adjacentMines(this.tile)());
+  public adjacentMines!: Signal<number>;
   public isHeldOver$?: Observable<boolean>;
 
-  constructor(public gameState: GameState, private _hostElement: ElementRef) {}
+  constructor(public gameState: GameState, private _hostElement: ElementRef) {
+    let numba = false;
+    this.num = numba;
+    numba = this.num;
+  }
 
   ngOnInit(): void {
     const contextmenu$: Observable<MouseEvent> = fromEvent(this._hostElement.nativeElement, 'contextmenu');
     contextmenu$.pipe(takeUntil(this._destroy$)).subscribe((evt) => evt.preventDefault());
 
     'ontouchstart' in window ? this._listenToTouchEvents() : this._listenToMouseEvents();
+  }
+
+  ngOnChanges(): void {
+    this.adjacentMines = computed(() => this.gameState.adjacentMines(this.tile)());
   }
 
   ngOnDestroy(): void {

@@ -1,13 +1,12 @@
-import { Injectable, computed } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
-import { shallowEqual } from 'fast-equals';
-import { immutableSignal } from 'ngx-immutable-signal';
+import { derived, immutableSignal } from 'ngx-immutable-signal';
 import { filter, find, interval, map, of, startWith, switchMap, takeUntil } from 'rxjs';
 import { GAME_CONFIGS } from '../constants/game-configs';
 import { Difficulty } from '../models/difficulty';
 import { GameProcess } from '../models/game-process';
 import { Point, Tile } from '../models/tile';
-import { equal, getAdjacentTiles, revealSafeAdjacentTiles, setRandomMine } from './game-state.helpers';
+import { getAdjacentTiles, revealSafeAdjacentTiles, setRandomMine } from './game-state.helpers';
 
 interface State {
   process: GameProcess;
@@ -19,25 +18,22 @@ interface State {
 export class GameState {
   private store = immutableSignal<State>({ process: GameProcess.Start, grid: [], difficulty: Difficulty.Beginner });
 
-  process = computed(() => this.store().process, { equal });
-  grid = computed(() => this.store().grid, { equal });
-  difficulty = computed(() => this.store().difficulty, { equal });
+  process = derived(() => this.store().process);
+  grid = derived(() => this.store().grid);
+  difficulty = derived(() => this.store().difficulty);
 
-  public remainingMines = computed(
-    () => {
-      if (this.process() === GameProcess.Start) return GAME_CONFIGS[this.difficulty()].mines;
-      if (this.process() === GameProcess.Win) return 0;
+  public remainingMines = derived(() => {
+    if (this.process() === GameProcess.Start) return GAME_CONFIGS[this.difficulty()].mines;
+    if (this.process() === GameProcess.Win) return 0;
 
-      let mines = 0;
-      let flags = 0;
-      for (const tile of this.grid().flat()) {
-        if (tile.isMine) mines++;
-        if (tile.isFlagged) flags++;
-      }
-      return mines - flags;
-    },
-    { equal }
-  );
+    let mines = 0;
+    let flags = 0;
+    for (const tile of this.grid().flat()) {
+      if (tile.isMine) mines++;
+      if (tile.isFlagged) flags++;
+    }
+    return mines - flags;
+  });
 
   // example of rxjs interop
   private process$ = toObservable(this.process);
@@ -55,11 +51,10 @@ export class GameState {
   );
 
   // example of custom change detection
-  private adjacentTiles = (tile: Tile) => computed(() => getAdjacentTiles(this.grid(), tile), { equal: shallowEqual });
+  private adjacentTiles = (tile: Tile) => derived(() => getAdjacentTiles(this.grid(), tile), 'shallow');
 
   // example of deriving a parameterized selector
-  public adjacentMines = (tile: Tile) =>
-    computed(() => this.adjacentTiles(tile)().filter((t) => t.isMine).length, { equal });
+  public adjacentMines = (tile: Tile) => derived(() => this.adjacentTiles(tile)().filter((t) => t.isMine).length);
 
   public generateNewBoard(): void {
     const { dimensions, mines } = GAME_CONFIGS[this.difficulty()];

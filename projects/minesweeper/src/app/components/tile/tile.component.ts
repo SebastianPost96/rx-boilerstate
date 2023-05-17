@@ -8,8 +8,8 @@ import {
   OnDestroy,
   OnInit,
   Signal,
-  computed,
 } from '@angular/core';
+import { derived } from 'ngx-immutable-signal';
 import {
   Observable,
   delayWhen,
@@ -42,11 +42,7 @@ export class TileComponent implements OnInit, OnDestroy, OnChanges {
   public adjacentMines!: Signal<number>;
   public isHeldOver$?: Observable<boolean>;
 
-  constructor(public gameState: GameState, private _hostElement: ElementRef) {
-    let numba = false;
-    this.num = numba;
-    numba = this.num;
-  }
+  constructor(public gameState: GameState, private _hostElement: ElementRef) {}
 
   ngOnInit(): void {
     const contextmenu$: Observable<MouseEvent> = fromEvent(this._hostElement.nativeElement, 'contextmenu');
@@ -56,7 +52,7 @@ export class TileComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnChanges(): void {
-    this.adjacentMines = computed(() => this.gameState.adjacentMines(this.tile)());
+    this.adjacentMines = derived(() => this.gameState.adjacentMines(this.tile)());
   }
 
   ngOnDestroy(): void {

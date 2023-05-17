@@ -1,5 +1,9 @@
 import { Tile } from '../models/tile';
 
+export function equal<T>(a: T, b: T) {
+  return a === b;
+}
+
 export function setRandomMine(tiles: Tile[][]): void {
   function getRandomInt(max: number) {
     return Math.floor(Math.random() * max);

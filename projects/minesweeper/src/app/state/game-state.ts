@@ -7,7 +7,7 @@ import { GAME_CONFIGS } from '../constants/game-configs';
 import { Difficulty } from '../models/difficulty';
 import { GameProcess } from '../models/game-process';
 import { Point, Tile } from '../models/tile';
-import { getAdjacentTiles, revealSafeAdjacentTiles, setRandomMine } from './game-state.helpers';
+import { equal, getAdjacentTiles, revealSafeAdjacentTiles, setRandomMine } from './game-state.helpers';
 
 interface State {
   process: GameProcess;
@@ -19,22 +19,25 @@ interface State {
 export class GameState {
   private store = immutableSignal<State>({ process: GameProcess.Start, grid: [], difficulty: Difficulty.Beginner });
 
-  process = computed(() => this.store().process);
-  grid = computed(() => this.store().grid);
-  difficulty = computed(() => this.store().difficulty);
+  process = computed(() => this.store().process, { equal });
+  grid = computed(() => this.store().grid, { equal });
+  difficulty = computed(() => this.store().difficulty, { equal });
 
-  public remainingMines = computed(() => {
-    if (this.process() === GameProcess.Start) return GAME_CONFIGS[this.difficulty()].mines;
-    if (this.process() === GameProcess.Win) return 0;
+  public remainingMines = computed(
+    () => {
+      if (this.process() === GameProcess.Start) return GAME_CONFIGS[this.difficulty()].mines;
+      if (this.process() === GameProcess.Win) return 0;
 
-    let mines = 0;
-    let flags = 0;
-    for (const tile of this.grid().flat()) {
-      if (tile.isMine) mines++;
-      if (tile.isFlagged) flags++;
-    }
-    return mines - flags;
-  });
+      let mines = 0;
+      let flags = 0;
+      for (const tile of this.grid().flat()) {
+        if (tile.isMine) mines++;
+        if (tile.isFlagged) flags++;
+      }
+      return mines - flags;
+    },
+    { equal }
+  );
 
   // example of rxjs interop
   private process$ = toObservable(this.process);
@@ -55,7 +58,8 @@ export class GameState {
   private adjacentTiles = (tile: Tile) => computed(() => getAdjacentTiles(this.grid(), tile), { equal: shallowEqual });
 
   // example of deriving a parameterized selector
-  public adjacentMines = (tile: Tile) => computed(() => this.adjacentTiles(tile)().filter((t) => t.isMine).length);
+  public adjacentMines = (tile: Tile) =>
+    computed(() => this.adjacentTiles(tile)().filter((t) => t.isMine).length, { equal });
 
   public generateNewBoard(): void {
     const { dimensions, mines } = GAME_CONFIGS[this.difficulty()];

@@ -1,8 +1,3 @@
 <div
-  *ngIf="{
-    isHeldOver: (isHeldOver$ | async)!,
-    adjacentMines: (adjacentMines$ | async)!,
-    gameProcess: (state.process$ | async)!
-  } as state"
-  [style.background-image]="tile | tileImage : !!state.isHeldOver : state.adjacentMines : state.gameProcess"
+  [style.background-image]="tile | tileImage : (isHeldOver$ | async)! : (adjacentMines$ | async)! : (state.process$ | async)!"
 ></div>

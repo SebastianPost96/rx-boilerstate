@@ -36,8 +36,6 @@ import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 export class TileComponent implements OnInit {
   @Input() tile!: Tile;
 
-
-
   public adjacentMines$?: Selector<number>;
   public isHeldOver$?: Observable<boolean>;
 
@@ -51,9 +49,7 @@ export class TileComponent implements OnInit {
 
     'ontouchstart' in window ? this._listenToTouchEvents() : this._listenToMouseEvents();
   }
-
-
-
+  
   private _listenToTouchEvents(): void {
     this.isHeldOver$ = of(false);
     const touchend$ = fromSharedEvent(this._hostElement.nativeElement, 'touchend');

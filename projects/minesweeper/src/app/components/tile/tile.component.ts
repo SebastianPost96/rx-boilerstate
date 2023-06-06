@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  OnInit
+} from '@angular/core';
 import { Selector } from 'rx-boilerstate';
 import {
   Observable,
@@ -16,6 +25,7 @@ import {
 } from 'rxjs';
 import { Tile } from '../../models/tile';
 import { GameState } from '../../state/game-state';
+import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 
 @Component({
   selector: 'app-tile[tile]',
@@ -23,29 +33,26 @@ import { GameState } from '../../state/game-state';
   styleUrls: ['./tile.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TileComponent implements OnInit, OnDestroy {
+export class TileComponent implements OnInit {
   @Input() tile!: Tile;
 
-  private _destroy$ = new EventEmitter<void>();
+
 
   public adjacentMines$?: Selector<number>;
   public isHeldOver$?: Observable<boolean>;
 
-  constructor(public state: GameState, private _hostElement: ElementRef) {}
+  constructor(public state: GameState, private _hostElement: ElementRef, private _destroy: DestroyRef) {}
 
   ngOnInit(): void {
     this.adjacentMines$ = this.state.adjacentMines(this.tile);
 
     const contextmenu$: Observable<MouseEvent> = fromEvent(this._hostElement.nativeElement, 'contextmenu');
-    contextmenu$.pipe(takeUntil(this._destroy$)).subscribe((evt) => evt.preventDefault());
+    contextmenu$.pipe(takeUntilDestroyed(this._destroy)).subscribe((evt) => evt.preventDefault());
 
     'ontouchstart' in window ? this._listenToTouchEvents() : this._listenToMouseEvents();
   }
 
-  ngOnDestroy(): void {
-    this._destroy$.next();
-    this._destroy$.complete();
-  }
+
 
   private _listenToTouchEvents(): void {
     this.isHeldOver$ = of(false);
@@ -61,14 +68,14 @@ export class TileComponent implements OnInit, OnDestroy {
       share()
     );
 
-    onflag$.pipe(takeUntil(this._destroy$)).subscribe(() => {
+    onflag$.pipe(takeUntilDestroyed(this._destroy)).subscribe(() => {
       if (!this.tile.revealed) navigator.vibrate(50);
       this.state.flagTile(this.tile.location);
     });
     touchstart$
       .pipe(
         delayWhen(() => touchend$.pipe(takeUntil(merge(touchmove$, onflag$)))),
-        takeUntil(this._destroy$)
+        takeUntilDestroyed(this._destroy)
       )
       .subscribe(() => this.state.revealTile(this.tile.location));
   }
@@ -79,11 +86,11 @@ export class TileComponent implements OnInit, OnDestroy {
     const mouseenter$: Observable<MouseEvent> = fromEvent(this._hostElement.nativeElement, 'mouseenter');
     const mouseleave$ = fromSharedEvent(this._hostElement.nativeElement, 'mouseleave');
 
-    mousedown$.pipe(takeUntil(this._destroy$)).subscribe((evt) => {
+    mousedown$.pipe(takeUntilDestroyed(this._destroy)).subscribe((evt) => {
       if (evt.button !== 2) return;
       this.state.flagTile(this.tile.location);
     });
-    mouseup$.pipe(takeUntil(this._destroy$)).subscribe((evt) => {
+    mouseup$.pipe(takeUntilDestroyed(this._destroy)).subscribe((evt) => {
       if (evt.button !== 0) return;
       this.state.revealTile(this.tile.location);
     });

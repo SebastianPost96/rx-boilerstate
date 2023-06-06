@@ -1,0 +1,111 @@
+{
+  "configVersion": 1,
+  "timestamp": 1686060120598,
+  "index": "https://SebastianPost96.github.io/rx-boilerstate/index.html",
+  "assetGroups": [
+    {
+      "name": "app",
+      "installMode": "prefetch",
+      "updateMode": "prefetch",
+      "cacheQueryOptions": {
+        "ignoreVary": true
+      },
+      "urls": [
+        "https://SebastianPost96.github.io/rx-boilerstate/favicon.ico",
+        "https://SebastianPost96.github.io/rx-boilerstate/index.html",
+        "https://SebastianPost96.github.io/rx-boilerstate/main.ae85eb251850d71a.js",
+        "https://SebastianPost96.github.io/rx-boilerstate/manifest.webmanifest",
+        "https://SebastianPost96.github.io/rx-boilerstate/polyfills.494e87547effb78d.js",
+        "https://SebastianPost96.github.io/rx-boilerstate/runtime.be081af52b56e8f0.js",
+        "https://SebastianPost96.github.io/rx-boilerstate/styles.f03140a387bb5ee1.css"
+      ],
+      "patterns": []
+    },
+    {
+      "name": "assets",
+      "installMode": "lazy",
+      "updateMode": "prefetch",
+      "cacheQueryOptions": {
+        "ignoreVary": true
+      },
+      "urls": [
+        "https://SebastianPost96.github.io/rx-boilerstate/assets/angular.png",
+        "https://SebastianPost96.github.io/rx-boilerstate/assets/icons/icon-128x128.png",
+        "https://SebastianPost96.github.io/rx-boilerstate/assets/icons/icon-144x144.png",
+        "https://SebastianPost96.github.io/rx-boilerstate/assets/icons/icon-152x152.png",
+        "https://SebastianPost96.github.io/rx-boilerstate/assets/icons/icon-192x192.png",
+        "https://SebastianPost96.github.io/rx-boilerstate/assets/icons/icon-384x384.png",
+        "https://SebastianPost96.github.io/rx-boilerstate/assets/icons/icon-512x512.png",
+        "https://SebastianPost96.github.io/rx-boilerstate/assets/icons/icon-72x72.png",
+        "https://SebastianPost96.github.io/rx-boilerstate/assets/icons/icon-96x96.png",
+        "https://SebastianPost96.github.io/rx-boilerstate/assets/tile/1.svg",
+        "https://SebastianPost96.github.io/rx-boilerstate/assets/tile/2.svg",
+        "https://SebastianPost96.github.io/rx-boilerstate/assets/tile/3.svg",
+        "https://SebastianPost96.github.io/rx-boilerstate/assets/tile/4.svg",
+        "https://SebastianPost96.github.io/rx-boilerstate/assets/tile/5.svg",
+        "https://SebastianPost96.github.io/rx-boilerstate/assets/tile/6.svg",
+        "https://SebastianPost96.github.io/rx-boilerstate/assets/tile/7.svg",
+        "https://SebastianPost96.github.io/rx-boilerstate/assets/tile/8.svg",
+        "https://SebastianPost96.github.io/rx-boilerstate/assets/tile/flag.svg",
+        "https://SebastianPost96.github.io/rx-boilerstate/assets/tile/mine-red.jpg",
+        "https://SebastianPost96.github.io/rx-boilerstate/assets/tile/mine.png",
+        "https://SebastianPost96.github.io/rx-boilerstate/assets/tile/revealed.svg",
+        "https://SebastianPost96.github.io/rx-boilerstate/assets/tile/unopened.svg",
+        "https://SebastianPost96.github.io/rx-boilerstate/assets/tile/wrong-flag.png"
+      ],
+      "patterns": []
+    }
+  ],
+  "dataGroups": [],
+  "hashTable": {
+    "https://SebastianPost96.github.io/rx-boilerstate/assets/angular.png": "44d049467a8d102ca694fc3ca573eb468de41061",
+    "https://SebastianPost96.github.io/rx-boilerstate/assets/icons/icon-128x128.png": "b1f06c7d714abb4a0cc4d1f7c954feb26826e4c4",
+    "https://SebastianPost96.github.io/rx-boilerstate/assets/icons/icon-144x144.png": "96a0d629765c1bc85d9263c6bc83094ca776d267",
+    "https://SebastianPost96.github.io/rx-boilerstate/assets/icons/icon-152x152.png": "b1fbbee3902eb96a7658e3bb006f31f78ca5a44c",
+    "https://SebastianPost96.github.io/rx-boilerstate/assets/icons/icon-192x192.png": "e4211163bf0911688fbfb80278d8ff4d2f77691d",
+    "https://SebastianPost96.github.io/rx-boilerstate/assets/icons/icon-384x384.png": "329749cd6393768d3131ed6304c136b1ca05f2fd",
+    "https://SebastianPost96.github.io/rx-boilerstate/assets/icons/icon-512x512.png": "559d9c4318b45a1f2b10596bbb4c960fe521dbcc",
+    "https://SebastianPost96.github.io/rx-boilerstate/assets/icons/icon-72x72.png": "279825a1ac4377032ae996a1832c641e33ccf1b6",
+    "https://SebastianPost96.github.io/rx-boilerstate/assets/icons/icon-96x96.png": "592885efcbfee27e5e20be4fa3043589390d2740",
+    "https://SebastianPost96.github.io/rx-boilerstate/assets/tile/1.svg": "599842e8d5429cd925c6b46760708481ec5d2486",
+    "https://SebastianPost96.github.io/rx-boilerstate/assets/tile/2.svg": "575c5f3e63eb73f222a11ca7b6a6e48248ff31b1",
+    "https://SebastianPost96.github.io/rx-boilerstate/assets/tile/3.svg": "b07592a8129420d031d5bb5be178201cb9e42fb6",
+    "https://SebastianPost96.github.io/rx-boilerstate/assets/tile/4.svg": "cf4dc8f3ff7a549150db4ec4d48e4bdcb6e452d8",
+    "https://SebastianPost96.github.io/rx-boilerstate/assets/tile/5.svg": "b51bfc71da0cb50f17c7274a235b6b95d2e6d9ee",
+    "https://SebastianPost96.github.io/rx-boilerstate/assets/tile/6.svg": "f9429a948366769c0bc700daac62d62cad45dc64",
+    "https://SebastianPost96.github.io/rx-boilerstate/assets/tile/7.svg": "c4fb830a4c83377f0e2c76594d233a49797c65a9",
+    "https://SebastianPost96.github.io/rx-boilerstate/assets/tile/8.svg": "f101925fe25eb33558b26a7e8cd6b397aacd6b61",
+    "https://SebastianPost96.github.io/rx-boilerstate/assets/tile/flag.svg": "38343b8dae20e5540064d81ba143d36f46243a2e",
+    "https://SebastianPost96.github.io/rx-boilerstate/assets/tile/mine-red.jpg": "ed535e9b616f72facb1b6264bb7f4e7e3e520796",
+    "https://SebastianPost96.github.io/rx-boilerstate/assets/tile/mine.png": "14b5b65702be3faaca25f88c5d75d248754755f0",
+    "https://SebastianPost96.github.io/rx-boilerstate/assets/tile/revealed.svg": "47e20689b44e1895cf13d1ee02c02205ab2fec93",
+    "https://SebastianPost96.github.io/rx-boilerstate/assets/tile/unopened.svg": "0f24f7e00ea1b513e3b7f3f0bb87d2d782a04de7",
+    "https://SebastianPost96.github.io/rx-boilerstate/assets/tile/wrong-flag.png": "0d0ce6b814571f1e2a0b299447a8bcadda7405e2",
+    "https://SebastianPost96.github.io/rx-boilerstate/favicon.ico": "22f6a4a3bcaafafb0254e0f2fa4ceb89e505e8b2",
+    "https://SebastianPost96.github.io/rx-boilerstate/index.html": "a708892f54d71335ddcf8c5df572c849db7bd7d6",
+    "https://SebastianPost96.github.io/rx-boilerstate/main.ae85eb251850d71a.js": "60d2aed2e7e6c13373d312ecf762bb39ac2c8afc",
+    "https://SebastianPost96.github.io/rx-boilerstate/manifest.webmanifest": "0c1a3344ae79db64118bf347827749400a033e8e",
+    "https://SebastianPost96.github.io/rx-boilerstate/polyfills.494e87547effb78d.js": "d36d7e3acd71bdbf12d6898eebd6c6a3498e4288",
+    "https://SebastianPost96.github.io/rx-boilerstate/runtime.be081af52b56e8f0.js": "ba41f19de79300f5bd59c26fa34c3f2e042e44e8",
+    "https://SebastianPost96.github.io/rx-boilerstate/styles.f03140a387bb5ee1.css": "2e80c778e9089d37b4950583ed4e5aa6cf89edd5"
+  },
+  "navigationUrls": [
+    {
+      "positive": true,
+      "regex": "^\\/.*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*\\.[^/]*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*__[^/]*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*__[^/]*\\/.*$"
+    }
+  ],
+  "navigationRequestStrategy": "performance"
+}

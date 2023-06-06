@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1686060120598,
+  "timestamp": 1686063723586,
   "index": "https://SebastianPost96.github.io/rx-boilerstate/index.html",
   "assetGroups": [
     {
@@ -13,7 +13,7 @@
       "urls": [
         "https://SebastianPost96.github.io/rx-boilerstate/favicon.ico",
         "https://SebastianPost96.github.io/rx-boilerstate/index.html",
-        "https://SebastianPost96.github.io/rx-boilerstate/main.ae85eb251850d71a.js",
+        "https://SebastianPost96.github.io/rx-boilerstate/main.c283690418e136d8.js",
         "https://SebastianPost96.github.io/rx-boilerstate/manifest.webmanifest",
         "https://SebastianPost96.github.io/rx-boilerstate/polyfills.494e87547effb78d.js",
         "https://SebastianPost96.github.io/rx-boilerstate/runtime.be081af52b56e8f0.js",
@@ -82,8 +82,8 @@
     "https://SebastianPost96.github.io/rx-boilerstate/assets/tile/unopened.svg": "0f24f7e00ea1b513e3b7f3f0bb87d2d782a04de7",
     "https://SebastianPost96.github.io/rx-boilerstate/assets/tile/wrong-flag.png": "0d0ce6b814571f1e2a0b299447a8bcadda7405e2",
     "https://SebastianPost96.github.io/rx-boilerstate/favicon.ico": "22f6a4a3bcaafafb0254e0f2fa4ceb89e505e8b2",
-    "https://SebastianPost96.github.io/rx-boilerstate/index.html": "a708892f54d71335ddcf8c5df572c849db7bd7d6",
-    "https://SebastianPost96.github.io/rx-boilerstate/main.ae85eb251850d71a.js": "60d2aed2e7e6c13373d312ecf762bb39ac2c8afc",
+    "https://SebastianPost96.github.io/rx-boilerstate/index.html": "0976e5f236da187ef36f705ce32608c9bb80f985",
+    "https://SebastianPost96.github.io/rx-boilerstate/main.c283690418e136d8.js": "ca730b6e7370a245783707d8756494689f2e6476",
     "https://SebastianPost96.github.io/rx-boilerstate/manifest.webmanifest": "0c1a3344ae79db64118bf347827749400a033e8e",
     "https://SebastianPost96.github.io/rx-boilerstate/polyfills.494e87547effb78d.js": "d36d7e3acd71bdbf12d6898eebd6c6a3498e4288",
     "https://SebastianPost96.github.io/rx-boilerstate/runtime.be081af52b56e8f0.js": "ba41f19de79300f5bd59c26fa34c3f2e042e44e8",

@@ -53,9 +53,15 @@
             "polyfills": ["zone.js"],
             "tsConfig": "projects/minesweeper/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
-            "assets": ["projects/minesweeper/src/favicon.ico", "projects/minesweeper/src/assets"],
+            "assets": [
+              "projects/minesweeper/src/favicon.ico",
+              "projects/minesweeper/src/assets",
+              "projects/minesweeper/src/manifest.webmanifest"
+            ],
             "styles": ["projects/minesweeper/src/styles.scss"],
-            "scripts": []
+            "scripts": [],
+            "serviceWorker": true,
+            "ngswConfigPath": "projects/minesweeper/ngsw-config.json"
           },
           "configurations": {
             "production": {

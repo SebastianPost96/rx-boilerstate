@@ -115,7 +115,7 @@ export class GameState extends State<GameModel> {
   }
 
   public setDifficulty(difficulty: Difficulty): void {
-    const difficultyChanged = difficulty !== this.asSelector().snapshot.difficulty;
+    const difficultyChanged = difficulty !== this.difficulty$.snapshot;
 
     this.updateState((state) => {
       state.difficulty = difficulty;
